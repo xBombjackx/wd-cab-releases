@@ -1,8 +1,8 @@
-WD Cab — End User License Agreement (Freeware Beta)
+Werewolf Dynamics — End User License Agreement (Freeware Beta)
 
 Copyright (c) 2026 Werewolf Dynamics. All rights reserved.
 
-This agreement covers the WD Cab plugin binaries distributed
+This agreement covers the Werewolf Dynamics plugin binaries distributed
 through this repository's Releases page ("the Software").
 
 WHAT YOU MAY DO
@@ -46,5 +46,5 @@ TERMINATION
 THIRD-PARTY NOTICES
 
 10. The Software is built with the JUCE framework (c) Raw Material
-    Software Limited, and the VST 3 SDK. VST is a registered trademark
-    of Steinberg Media Technologies GmbH.
+    Software Limited, CLAP (MIT License), and the VST 3 SDK. VST is a
+    registered trademark of Steinberg Media Technologies GmbH.
