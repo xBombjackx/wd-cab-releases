@@ -264,7 +264,7 @@
   ];
 
   function decodeWavMonoJs(arrayBuffer) {
-    if (!arrayBuffer || arrayBuffer.byteLength < 12) return null;
+    if (!arrayBuffer || arrayBuffer.byteLength < 44 || arrayBuffer.byteLength > 16 * 1024 * 1024) return null;
     const view = new DataView(arrayBuffer);
     const len = arrayBuffer.byteLength;
     const readTag = off => String.fromCharCode(
@@ -272,6 +272,7 @@
     );
     if (readTag(0) !== 'RIFF' || readTag(8) !== 'WAVE') return null;
 
+    const guidTail = [0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0xAA, 0x00, 0x38, 0x9B, 0x71];
     let fmtTag = 0, ch = 0, sr = 0, bps = 0;
     let hasFmt = false, dataOff = 0, dataSize = 0, hasData = false;
     let pos = 12;
@@ -279,60 +280,67 @@
       const id = readTag(pos);
       const sz = view.getUint32(pos + 4, true);
       const body = pos + 8;
-      if (body > len) break;
       const avail = Math.min(sz, len - body);
-      if (id === 'fmt ' && avail >= 16) {
+      if (id === 'fmt ') {
+        if (avail < 16) return null;
         let tag = view.getUint16(body, true);
         ch  = view.getUint16(body + 2, true);
         sr  = view.getUint32(body + 4, true);
         bps = view.getUint16(body + 14, true);
-        if (tag === 0xFFFE && avail >= 40) {
-          tag = view.getUint16(body + 24, true);
+        if (tag === 0xFFFE) {
+          if (avail < 40) return null;
+          for (let k = 0; k < 14; k++) {
+            if (view.getUint8(body + 26 + k) !== guidTail[k]) return null;
+          }
+          const subFmt = view.getUint16(body + 24, true);
+          if (subFmt !== 1 && subFmt !== 3) return null;
+          tag = subFmt;
         }
         fmtTag = tag;
         hasFmt = true;
+        if (hasData) break;
       } else if (id === 'data') {
         dataOff = body;
         dataSize = avail;
         hasData = true;
-        break;
+        if (hasFmt) break;
       }
-      pos = body + avail + (avail & 1);
+      const advance = 8 + sz + (sz & 1);
+      if (advance < 8 || advance > len - pos) break;
+      pos += advance;
     }
-    if (!hasFmt || !hasData || ch < 1 || ch > 8 || sr < 8000 || sr > 384000) return null;
+    if (!hasFmt || !hasData || ch < 1 || ch > 64 || sr < 8000 || sr > 768000) return null;
     const isPcm = fmtTag === 1 && (bps === 8 || bps === 16 || bps === 24 || bps === 32);
     const isFlt = fmtTag === 3 && (bps === 32 || bps === 64);
     if (!isPcm && !isFlt) return null;
     const bytesPerSmp = bps >> 3;
     const frameBytes = ch * bytesPerSmp;
+    if (frameBytes <= 0) return null;
     const totalFrames = Math.floor(dataSize / frameBytes);
     if (totalFrames <= 0) return null;
-    const numFrames = Math.min(totalFrames, 131072);
+    const maxScratch = (typeof uiEngine !== 'undefined' && uiEngine.wasm &&
+                        typeof uiEngine.wasm.wdcab_ir_scratch_max === 'function')
+      ? uiEngine.wasm.wdcab_ir_scratch_max()
+      : 131072;
+    const numFrames = Math.min(totalFrames, sr * 10, maxScratch);
     const mono = new Float32Array(numFrames);
-    const invCh = 1.0 / ch;
     for (let i = 0; i < numFrames; i++) {
-      let acc = 0.0;
-      const base = dataOff + i * frameBytes;
-      for (let c = 0; c < ch; c++) {
-        const s = base + c * bytesPerSmp;
-        let v = 0.0;
-        if (isPcm) {
-          if (bps === 8) v = (view.getUint8(s) - 128) / 128.0;
-          else if (bps === 16) v = view.getInt16(s, true) / 32768.0;
-          else if (bps === 24) {
-            let x = view.getUint8(s) | (view.getUint8(s + 1) << 8) | (view.getUint8(s + 2) << 16);
-            if (x & 0x800000) x |= ~0xFFFFFF;
-            v = x / 8388608.0;
-          } else {
-            v = view.getInt32(s, true) / 2147483648.0;
-          }
+      const s = dataOff + i * frameBytes;
+      let v = 0.0;
+      if (isPcm) {
+        if (bps === 8) v = (view.getUint8(s) - 128) / 128.0;
+        else if (bps === 16) v = view.getInt16(s, true) / 32768.0;
+        else if (bps === 24) {
+          let x = view.getUint8(s) | (view.getUint8(s + 1) << 8) | (view.getUint8(s + 2) << 16);
+          if (x & 0x800000) x |= ~0xFFFFFF;
+          v = x / 8388608.0;
         } else {
-          v = (bps === 32) ? view.getFloat32(s, true) : view.getFloat64(s, true);
+          v = view.getInt32(s, true) / 2147483648.0;
         }
-        if (Number.isFinite(v)) acc += v;
+      } else {
+        v = (bps === 32) ? view.getFloat32(s, true) : view.getFloat64(s, true);
       }
-      const m = acc * invCh;
-      mono[i] = Number.isFinite(m) ? Math.max(-64.0, Math.min(64.0, m)) : 0.0;
+      mono[i] = Number.isFinite(v) ? Math.max(-64.0, Math.min(64.0, v)) : 0.0;
     }
     return { mono, sampleRate: sr };
   }
@@ -408,10 +416,16 @@
       inp.type = 'file';
       inp.accept = '.wav,audio/wav';
       inp.style.display = 'none';
+      const maxIrBytes = 16 * 1024 * 1024;
+      inp.addEventListener('cancel', () => {
+        inp.remove();
+        resolve(null);
+      });
       inp.addEventListener('change', async () => {
         const f = inp.files && inp.files[0];
         inp.remove();
-        if (!f) { resolve(false); return; }
+        if (!f) { resolve(null); return; }
+        if (f.size < 44 || f.size > maxIrBytes) { resolve(false); return; }
         try {
           const ab = await f.arrayBuffer();
           const dec = decodeWavMonoJs(ab);

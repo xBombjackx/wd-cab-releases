@@ -47,6 +47,8 @@ class WdCabWorklet extends AudioWorkletProcessor {
     this.controlsDirty = false;
     this.pending = [];
     this.telemCountdown = 0;
+    const fsWorklet = (typeof sampleRate === 'number' && Number.isFinite(sampleRate) && sampleRate > 0) ? sampleRate : 48000;
+    this.telemPeriodQuanta = Math.max(6, Math.round(fsWorklet / (128 * 30))); // ~30 Hz telemetry/scope updates across sample rates
     const optResetSeq = options && options.processorOptions && typeof options.processorOptions.resetSeq === 'number' && Number.isFinite(options.processorOptions.resetSeq) ? options.processorOptions.resetSeq : 0;
     this.resetSeq = optResetSeq;
     this.port.onmessage = e => this.handle(e.data);
@@ -243,7 +245,7 @@ class WdCabWorklet extends AudioWorkletProcessor {
     }
 
     if (--this.telemCountdown <= 0) {
-      this.telemCountdown = 6; // ~every 6 quanta ≈ 16 ms (~60 Hz at 48 kHz)
+      this.telemCountdown = this.telemPeriodQuanta; // ~30 Hz at 48-384 kHz
       this.wasm.wdcab_update_telemetry();
       this.refreshViews();
       const t = this.f32.slice(this.telem, this.telem + TELEM_FLOATS);

@@ -183,6 +183,11 @@
     color: var(--kita-red);
     box-shadow: 0 0 10px var(--red-soft);
   }
+  .btn-toggle.ir-error {
+    background: var(--red-soft);
+    color: var(--kita-red);
+    box-shadow: 0 0 10px var(--red-soft);
+  }
 
   /* Top Row: Acoustic Analyzer + Motor Dynamics Strip */
   .top-row {
@@ -1662,6 +1667,50 @@
     }
   }
 
+  let scopeGridCanvas = null;
+  let scopeGridPw = 0, scopeGridPh = 0, scopeGridDpr = 0;
+  let scopeFillGrad = null, scopeFillGradH = 0;
+  let telemRafPending = false;
+  let lastCustomWaveA = [], lastCustomWaveB = [];
+  const domPrevWidth = new WeakMap();
+  const domPrevBg = new WeakMap();
+  function setTextCached (el, val) {
+    if (el && el.textContent !== val) {
+      el.textContent = val;
+    }
+  }
+  function setWidthCached (el, val) {
+    if (el && domPrevWidth.get(el) !== val) {
+      domPrevWidth.set(el, val);
+      el.style.width = val;
+    }
+  }
+  function setBgCached (el, val) {
+    if (el && domPrevBg.get(el) !== val) {
+      domPrevBg.set(el, val);
+      el.style.background = val;
+    }
+  }
+
+  function drawScopeGrid (gg, w, h, xOfFreq, yOfDb) {
+    gg.strokeStyle = '#22242a'; gg.lineWidth = 1;
+    gg.fillStyle = '#8e94a0'; gg.font = '600 8.5px "JetBrains Mono", monospace';
+    for (const f of [50, 100, 250, 500, 1000, 2500, 5000, 10000]) {
+      const x = xOfFreq(f);
+      gg.beginPath(); gg.moveTo(x, 0); gg.lineTo(x, h); gg.stroke();
+      gg.fillText(f >= 1000 ? (f / 1000) + 'k' : String(f), x + 3, h - 4);
+    }
+    for (const [dbVal, label, ohmLabel] of [[12, '+12dB', '54Ω'], [0, '0dB', '13.5Ω'], [-6, '-6dB', '6.8Ω']]) {
+      const y = yOfDb(dbVal);
+      gg.strokeStyle = (dbVal === 0) ? 'rgba(255, 126, 182, 0.16)' : '#1d1f25';
+      gg.beginPath(); gg.moveTo(0, y); gg.lineTo(w, y); gg.stroke();
+      gg.fillStyle = (dbVal === 0) ? '#ff7eb6' : '#6c727f';
+      gg.fillText(label, 5, y - 2);
+      gg.fillStyle = '#ff6b6b';
+      gg.fillText(ohmLabel, w - 34, y - 2);
+    }
+  }
+
   function drawScope () {
     const scope = $('responseScope');
     const g = scope.getContext('2d');
@@ -1678,23 +1727,21 @@
     const xOfFreq = f => (Math.log(f / 20) / Math.log(20000 / 20)) * w;
     const yOfDb   = db => h * 0.50 - (db / 18.0) * (h * 0.40);
 
-    // Log frequency grid
-    g.strokeStyle = '#22242a'; g.lineWidth = 1;
-    g.fillStyle = '#8e94a0'; g.font = '600 8.5px "JetBrains Mono", monospace';
-    for (const f of [50, 100, 250, 500, 1000, 2500, 5000, 10000]) {
-      const x = xOfFreq(f);
-      g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke();
-      g.fillText(f >= 1000 ? (f / 1000) + 'k' : String(f), x + 3, h - 4);
-    }
-    // Horizontal dB scale lines (left) + Impedance Ohm reference labels (right)
-    for (const [dbVal, label, ohmLabel] of [[12, '+12dB', '54Ω'], [0, '0dB', '13.5Ω'], [-6, '-6dB', '6.8Ω']]) {
-      const y = yOfDb(dbVal);
-      g.strokeStyle = (dbVal === 0) ? 'rgba(255, 126, 182, 0.16)' : '#1d1f25';
-      g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke();
-      g.fillStyle = (dbVal === 0) ? '#ff7eb6' : '#6c727f';
-      g.fillText(label, 5, y - 2);
-      g.fillStyle = '#ff6b6b';
-      g.fillText(ohmLabel, w - 34, y - 2);
+    // Cached static grid & dB/Ohm axis labels on offscreen canvas when drawImage is available
+    if (typeof g.drawImage === 'function') {
+      if (!scopeGridCanvas || scopeGridPw !== pw || scopeGridPh !== ph || scopeGridDpr !== dpr) {
+        scopeGridPw = pw; scopeGridPh = ph; scopeGridDpr = dpr;
+        if (!scopeGridCanvas) scopeGridCanvas = document.createElement('canvas');
+        scopeGridCanvas.width = pw;
+        scopeGridCanvas.height = ph;
+        const gg = scopeGridCanvas.getContext('2d');
+        gg.setTransform(dpr, 0, 0, dpr, 0, 0);
+        gg.clearRect(0, 0, w, h);
+        drawScopeGrid(gg, w, h, xOfFreq, yOfDb);
+      }
+      g.drawImage(scopeGridCanvas, 0, 0, w, h);
+    } else {
+      drawScopeGrid(g, w, h, xOfFreq, yOfDb);
     }
 
     // Dynamic speaker resonant frequency marker Fs(x)
@@ -1717,11 +1764,14 @@
     }
     g.lineTo(w, h);
     g.closePath();
-    const grad = g.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, 'rgba(255, 126, 182, 0.10)');
-    grad.addColorStop(0.6, 'rgba(110, 198, 255, 0.03)');
-    grad.addColorStop(1, 'rgba(0, 0, 0, 0.0)');
-    g.fillStyle = grad;
+    if (!scopeFillGrad || scopeFillGradH !== h) {
+      scopeFillGradH = h;
+      scopeFillGrad = g.createLinearGradient(0, 0, 0, h);
+      scopeFillGrad.addColorStop(0, 'rgba(255, 126, 182, 0.10)');
+      scopeFillGrad.addColorStop(0.6, 'rgba(110, 198, 255, 0.03)');
+      scopeFillGrad.addColorStop(1, 'rgba(0, 0, 0, 0.0)');
+    }
+    g.fillStyle = scopeFillGrad;
     g.fill();
 
     // Layer 2: Individual Cab A (#6ec6ff Ryo Blue) & Cab B (#ffd166 Nijika Yellow) dashed traces
@@ -1773,6 +1823,7 @@
   }
 
   function updateTelemetryUI () {
+    telemRafPending = false;
     const fsHz  = telem.effectiveFsHz || 96.0;
     const qts   = telem.effectiveQts || 0.65;
     const excur = telem.coneExcursionMm || 0.0;
@@ -1785,75 +1836,88 @@
     const gateDb = Math.abs(telem.gateDepthDb || 0.0);
 
     const impTag = imp < 0.72 ? '4Ω Lo-Z' : (imp > 1.35 ? '16Ω Hi-Z' : '8Ω Match');
-    $('badgeImp').textContent   = imp.toFixed(2) + 'x (' + impTag + ')';
-    $('badgeFs').textContent    = fsHz.toFixed(1) + ' Hz';
-    $('badgeQts').textContent   = qts.toFixed(2);
-    $('badgeExcur').textContent = excur.toFixed(2) + ' mm';
-    $('badgeProx').textContent  = (prox >= 0 ? '+' : '') + prox.toFixed(1) + ' dB';
+    const impLabel = imp.toFixed(2) + 'x (' + impTag + ')';
+    const fsLabel  = fsHz.toFixed(1) + ' Hz';
+    const exLabel  = excur.toFixed(2) + ' mm';
+    setTextCached($('badgeImp'),   impLabel);
+    setTextCached($('badgeFs'),    fsLabel);
+    setTextCached($('badgeQts'),   qts.toFixed(2));
+    setTextCached($('badgeExcur'), exLabel);
+    setTextCached($('badgeProx'),  (prox >= 0 ? '+' : '') + prox.toFixed(1) + ' dB');
 
-    $('sagBadge').textContent     = impTag;
-    $('valConeExcur').textContent = excur.toFixed(2) + ' mm';
-    $('valBPlus').textContent     = imp.toFixed(2) + 'x (' + impTag + ')';
-    $('valPwrTemp').textContent   = fsHz.toFixed(1) + ' Hz · Q ' + qts.toFixed(2);
-    $('valVcTemp').textContent    = vcC.toFixed(1) + ' °C';
+    setTextCached($('sagBadge'),     impTag);
+    setTextCached($('valConeExcur'), exLabel);
+    setTextCached($('valBPlus'),     impLabel);
+    setTextCached($('valPwrTemp'),   fsLabel + ' · Q ' + qts.toFixed(2));
+    setTextCached($('valVcTemp'),    vcC.toFixed(1) + ' °C');
 
     const excurPct = Math.max(2, Math.min(100, (excur / 1.8) * 100));
     const impPct   = Math.max(4, Math.min(100, ((imp - 0.5) / 1.5) * 65 + (sagDb / 4.0) * 35));
     const fsPct    = Math.max(4, Math.min(100, ((fsHz - 65.0) / 55.0) * 70 + excurPct * 0.30));
     const vcDelta  = Math.max(4, Math.min(100, ((vcC - 25.0) / 25.0) * 100 + excurPct * 0.25));
 
-    $('barConeExcur').style.width = excurPct + '%';
-    $('barBPlus').style.width     = impPct + '%';
-    $('barPwrTemp').style.width   = fsPct + '%';
-    $('barVcTemp').style.width    = vcDelta + '%';
+    setWidthCached($('barConeExcur'), excurPct.toFixed(1) + '%');
+    setWidthCached($('barBPlus'),     impPct.toFixed(1) + '%');
+    setWidthCached($('barPwrTemp'),   fsPct.toFixed(1) + '%');
+    setWidthCached($('barVcTemp'),    vcDelta.toFixed(1) + '%');
 
     const inPct   = Math.max(0, Math.min(100, ((inDb + 60.0) / 60.0) * 100));
     const outPct  = Math.max(0, Math.min(100, ((outDb + 60.0) / 60.0) * 100));
     const gatePct = Math.max(0, Math.min(100, (gateDb / 40.0) * 100));
 
-    $('inBar').style.width     = inPct + '%';
-    $('gateBar').style.width   = gatePct + '%';
-    $('outBar').style.width    = outPct + '%';
-    $('inMeter').textContent   = (inDb > -85 ? inDb.toFixed(1) + ' dB' : '-inf');
-    $('gateMeter').textContent = (telem.gateDepthDb || 0).toFixed(1) + ' dB';
-    $('outMeter').textContent  = (outDb > -85 ? outDb.toFixed(1) + ' dB' : '-inf');
+    setWidthCached($('inBar'),   inPct.toFixed(1) + '%');
+    setWidthCached($('gateBar'), gatePct.toFixed(1) + '%');
+    setWidthCached($('outBar'),  outPct.toFixed(1) + '%');
+    setTextCached($('inMeter'),   (inDb > -85 ? inDb.toFixed(1) + ' dB' : '-inf'));
+    setTextCached($('gateMeter'), (telem.gateDepthDb || 0).toFixed(1) + ' dB');
+    setTextCached($('outMeter'),  (outDb > -85 ? outDb.toFixed(1) + ' dB' : '-inf'));
 
     const inStatus = $('inStatus');
     const inPill   = $('inPill');
     inPill.classList.toggle('clip', !!telem.inClip);
     if (telem.inClip || inDb >= -0.4) {
-      inStatus.textContent = 'CLIP';
-      inStatus.className   = 'lvl-tag clip';
-      $('inBar').style.background = 'var(--kita-red)';
+      setTextCached(inStatus, 'CLIP');
+      if (inStatus.className !== 'lvl-tag clip') inStatus.className = 'lvl-tag clip';
+      setBgCached($('inBar'), 'var(--kita-red)');
     } else if (inDb > -6.0) {
-      inStatus.textContent = 'HOT';
-      inStatus.className   = 'lvl-tag hot';
-      $('inBar').style.background = 'var(--nijika-yellow)';
+      setTextCached(inStatus, 'HOT');
+      if (inStatus.className !== 'lvl-tag hot') inStatus.className = 'lvl-tag hot';
+      setBgCached($('inBar'), 'var(--nijika-yellow)');
     } else if (inDb >= -18.0) {
-      inStatus.textContent = 'OK';
-      inStatus.className   = 'lvl-tag ideal';
-      $('inBar').style.background = 'var(--ryo-blue)';
+      setTextCached(inStatus, 'OK');
+      if (inStatus.className !== 'lvl-tag ideal') inStatus.className = 'lvl-tag ideal';
+      setBgCached($('inBar'), 'var(--ryo-blue)');
     } else {
-      inStatus.textContent = 'OK';
-      inStatus.className   = 'lvl-tag';
-      $('inBar').style.background = 'var(--ryo-blue)';
+      setTextCached(inStatus, 'OK');
+      if (inStatus.className !== 'lvl-tag') inStatus.className = 'lvl-tag';
+      setBgCached($('inBar'), 'var(--ryo-blue)');
     }
 
     const outStatus = $('outStatus');
     const outPill   = $('outPill');
     outPill.classList.toggle('clip', !!telem.outClip);
     if (telem.outClip || outDb >= -0.3) {
-      outStatus.textContent = 'CLIP';
-      outStatus.className   = 'lvl-tag clip';
-      $('outBar').style.background = 'var(--kita-red)';
+      setTextCached(outStatus, 'CLIP');
+      if (outStatus.className !== 'lvl-tag clip') outStatus.className = 'lvl-tag clip';
+      setBgCached($('outBar'), 'var(--kita-red)');
     } else {
-      outStatus.textContent = 'OK';
-      outStatus.className   = 'lvl-tag';
-      $('outBar').style.background = 'var(--bocchi-pink)';
+      setTextCached(outStatus, 'OK');
+      if (outStatus.className !== 'lvl-tag') outStatus.className = 'lvl-tag';
+      setBgCached($('outBar'), 'var(--bocchi-pink)');
     }
 
     const irA = !!telem.cabACustomIr;
     const irB = !!telem.cabBCustomIr;
+    if (Array.isArray(telem.cabACustomIrWave)) {
+      lastCustomWaveA = irA ? telem.cabACustomIrWave : [];
+    } else if (!irA) {
+      lastCustomWaveA = [];
+    }
+    if (Array.isArray(telem.cabBCustomIrWave)) {
+      lastCustomWaveB = irB ? telem.cabBCustomIrWave : [];
+    } else if (!irB) {
+      lastCustomWaveB = [];
+    }
     if ($('cardCabA')) $('cardCabA').classList.toggle('ir-override', irA);
     if ($('cardCabB')) $('cardCabB').classList.toggle('ir-override', irB);
     if ($('irLoadABtn')) $('irLoadABtn').classList.toggle('on', irA);
@@ -1861,10 +1925,10 @@
     if ($('irClearABtn')) $('irClearABtn').style.display = irA ? 'inline-flex' : 'none';
     if ($('irClearBBtn')) $('irClearBBtn').style.display = irB ? 'inline-flex' : 'none';
     if (stageA && typeof stageA.setCustomIr === 'function') {
-      stageA.setCustomIr(irA, telem.cabACustomIrName || '', telem.cabACustomIrWave || []);
+      stageA.setCustomIr(irA, telem.cabACustomIrName || '', lastCustomWaveA);
     }
     if (stageB && typeof stageB.setCustomIr === 'function') {
-      stageB.setCustomIr(irB, telem.cabBCustomIrName || '', telem.cabBCustomIrWave || []);
+      stageB.setCustomIr(irB, telem.cabBCustomIrName || '', lastCustomWaveB);
     }
 
     drawScope();
@@ -1890,7 +1954,14 @@
         if (Array.isArray(d.curveImpedanceDb) && d.curveImpedanceDb.length === N) {
           curveImpedanceDb = d.curveImpedanceDb;
         }
-        requestAnimationFrame(updateTelemetryUI);
+        if (typeof requestAnimationFrame === 'function') {
+          if (!telemRafPending) {
+            telemRafPending = true;
+            requestAnimationFrame(updateTelemetryUI);
+          }
+        } else {
+          updateTelemetryUI();
+        }
       });
       if (window.__JUCE__ && window.__JUCE__.backend && typeof window.__JUCE__.backend.emitEvent === 'function') {
         window.__JUCE__.backend.emitEvent('requestTelemetry', {});
@@ -2031,11 +2102,38 @@
     };
 
     const bindUserIrSlot = (slot, loadBtnId, clearBtnId, cardId) => {
-      const loadBtn  = $(loadBtnId);
-      const clearBtn = $(clearBtnId);
-      const card     = $(cardId);
-      if (loadBtn)  loadBtn.addEventListener('click', () => callNative('loadUserIr', slot));
-      if (clearBtn) clearBtn.addEventListener('click', () => callNative('clearUserIr', slot));
+      const loadBtn   = $(loadBtnId);
+      const clearBtn  = $(clearBtnId);
+      const card      = $(cardId);
+      const idleLabel = (loadBtn && loadBtn.textContent) || 'IR';
+      let errTimer    = null;
+      const clearIrError = () => {
+        if (errTimer) {
+          clearTimeout(errTimer);
+          errTimer = null;
+        }
+        if (loadBtn && loadBtn.classList && loadBtn.classList.contains('ir-error')) {
+          loadBtn.classList.remove('ir-error');
+          loadBtn.textContent = idleLabel;
+        }
+      };
+      const flashIrError = () => {
+        if (!loadBtn || !loadBtn.classList) return;
+        loadBtn.classList.add('ir-error');
+        loadBtn.textContent = 'IR ERR';
+        if (errTimer) clearTimeout(errTimer);
+        errTimer = setTimeout(() => {
+          loadBtn.classList.remove('ir-error');
+          loadBtn.textContent = idleLabel;
+          errTimer = null;
+        }, 2200);
+      };
+      const handleLoadOutcome = ok => {
+        if (ok === false) flashIrError();
+        else if (ok === true) clearIrError();
+      };
+      if (loadBtn)  loadBtn.addEventListener('click', () => Promise.resolve(callNative('loadUserIr', slot)).then(handleLoadOutcome));
+      if (clearBtn) clearBtn.addEventListener('click', () => { clearIrError(); callNative('clearUserIr', slot); });
       if (card) {
         const setDrag = on => card.classList && card.classList.toggle('ir-dragover', on);
         card.addEventListener('dragenter', e => { e.preventDefault(); e.stopPropagation(); setDrag(true); });
@@ -2047,13 +2145,20 @@
           setDrag(false);
           const files = e.dataTransfer && e.dataTransfer.files;
           const file  = files && files[0];
-          if (!file || typeof FileReader === 'undefined' || file.size > 32 * 1024 * 1024) return;
+          if (!file) return;
+          if (typeof FileReader === 'undefined' || file.size < 44 || file.size > 16 * 1024 * 1024) {
+            flashIrError();
+            return;
+          }
           const reader = new FileReader();
+          reader.onerror = () => flashIrError();
           reader.onload = () => {
             const res = typeof reader.result === 'string' ? reader.result : '';
             const comma = res.indexOf(',');
             const b64 = comma >= 0 ? res.slice(comma + 1) : res;
-            if (b64) callNative('dropUserIrBase64', slot, file.name || ('Cab' + (slot === 0 ? 'A' : 'B') + '.wav'), b64);
+            if (!b64) { flashIrError(); return; }
+            Promise.resolve(callNative('dropUserIrBase64', slot, file.name || ('Cab' + (slot === 0 ? 'A' : 'B') + '.wav'), b64))
+              .then(handleLoadOutcome);
           };
           reader.readAsDataURL(file);
         });
