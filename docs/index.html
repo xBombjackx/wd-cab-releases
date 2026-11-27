@@ -11,7 +11,7 @@
   @font-face { font-family: 'Barlow'; font-weight: 700; src: url('./fonts/Barlow-700.woff2') format('woff2'); }
   @font-face { font-family: 'Quicksand'; font-weight: 600; src: url('./fonts/Barlow-600.woff2') format('woff2'); }
   @font-face { font-family: 'Quicksand'; font-weight: 700; src: url('./fonts/Barlow-700.woff2') format('woff2'); }
-  @font-face { font-family: 'JetBrains Mono'; font-weight: 400 700; src: local('JetBrains Mono'), local('Cascadia Mono'), local('Consolas'), url('./fonts/Barlow-600.woff2') format('woff2'); }
+  @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400 700; src: url('./fonts/JetBrainsMono.woff2') format('woff2'); }
 
   :root {
     --bg: #141517;
@@ -19,12 +19,13 @@
     --panel: #1e2024;
     --panel-hi: #262930;
     --well: #121316;
-    --border: #2c2f36;
-    --border-hi: #363a44;
+    --border: #686f7e;
+    --border-hi: #808899;
+    --mono: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', 'Barlow', ui-monospace, monospace;
 
     --text: #eceef2;
     --muted: #b6bcc8;
-    --dim: #8e94a0;
+    --dim: #949aa6;
 
     /* 4 Kessoku Signature Accents */
     --bocchi-pink: #ff7eb6;
@@ -48,6 +49,25 @@
   }
 
   * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+  :focus-visible {
+    outline: 2px solid var(--ryo-blue);
+    outline-offset: 2px;
+  }
+  .seg-group button:focus-visible,
+  .hdr .btn-toggle:focus-visible,
+  .wd-preset-item:focus-visible {
+    outline: 2px solid var(--ryo-blue);
+    outline-offset: -2px;
+  }
+  .mic-stage-canvas:focus-visible {
+    outline: 2px solid var(--ryo-blue);
+    outline-offset: -3px;
+  }
+  .knob:focus-visible {
+    outline: 2px solid var(--ryo-blue);
+    outline-offset: 1px;
+    border-radius: 8px;
+  }
   html, body {
     margin: 0; padding: 0; width: 100%; height: 100%;
     background: var(--bg); color: var(--text);
@@ -64,21 +84,23 @@
     border-radius: 16px;
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
     display: flex; flex-direction: column;
-    padding: 9px 12px;
-    gap: 8px;
+    padding: 8px 12px;
+    gap: 6px;
     overflow: hidden;
   }
 
   /* Top Frameless Pill Bar */
   .hdr {
     display: flex; align-items: center; justify-content: space-between;
-    height: 40px; flex-shrink: 0; padding: 0 16px;
+    height: 42px; flex-shrink: 0; padding: 0 8px;
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 999px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.40);
+    gap: 4px;
+    white-space: nowrap;
   }
-  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand { display: flex; align-items: center; gap: 5px; flex-shrink: 0; white-space: nowrap; }
   .kessoku-ties {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 3.5px 7px; background: var(--well);
@@ -92,46 +114,84 @@
 
   .brand-title {
     font-family: 'Quicksand', 'Barlow', sans-serif;
-    font-size: 14px; font-weight: 700; letter-spacing: 0.11em;
+    font-size: 13.5px; font-weight: 700; letter-spacing: 0.08em;
     color: var(--bocchi-pink-hi);
   }
-  .brand-tag {
-    font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em;
-    color: var(--ryo-blue); text-transform: uppercase;
-    padding: 3px 9px; border-radius: 999px;
-    background: var(--blue-soft);
+  #rigModeSeg button { min-height: 24px; padding: 3px 5px; font-size: 10px; letter-spacing: 0.02em; }
+  #rigModeSeg button.blue.on {
+    background: var(--blue-soft); color: var(--ryo-blue);
+    box-shadow: 0 2px 8px var(--blue-soft);
   }
   .brand-sub {
-    font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.01em;
     color: var(--dim);
   }
 
-  .hdr-right { display: flex; align-items: center; gap: 7px; }
+  .hdr-right { display: flex; align-items: center; gap: 3px; flex-shrink: 0; white-space: nowrap; }
+  .hdr-sep {
+    width: 1px; height: 15px; background: var(--border); flex-shrink: 0;
+  }
+  .seg-group.hdr-pill-group {
+    border: 1px solid var(--border); padding: 2px; gap: 1.5px; flex-shrink: 0;
+  }
+  .seg-group.hdr-pill-group button {
+    min-width: 24px; min-height: 24px; padding: 3px 5px; font-size: 10px; letter-spacing: 0.03em;
+  }
+  #abCopyBtn { min-width: 46px; text-align: center; }
+  .seg-group.hdr-pill-group button.amber.on {
+    background: var(--yellow-soft); color: var(--nijika-yellow);
+    box-shadow: 0 2px 8px var(--yellow-soft);
+  }
+  .seg-group.hdr-pill-group button.ir-error {
+    background: var(--red-soft); color: var(--kita-red);
+    box-shadow: 0 0 10px var(--red-soft);
+  }
   .hdr-preset-sel {
     background: var(--well); color: var(--text);
-    border: 1px solid #24272e; border-radius: 999px;
-    padding: 4px 10px; font-size: 9.5px; font-weight: 700;
-    font-family: inherit; max-width: 215px; outline: none;
+    border: 1px solid var(--border); border-radius: 999px;
+    min-height: 26px; padding: 3px 7px; font-size: 10px; font-weight: 700;
+    font-family: inherit; max-width: 128px;
     cursor: pointer; transition: border-color 0.14s ease;
+    flex-shrink: 0;
   }
   .hdr-preset-sel:hover, .hdr-preset-sel:focus { border-color: var(--bocchi-pink); }
+  .wd-preset-menu {
+    position: fixed; z-index: 10050;
+    background: #16181d; border: 1px solid var(--border-hi); border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+    padding: 4px; display: flex; flex-direction: column; gap: 2px;
+    overflow-y: auto; font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  .wd-preset-item {
+    display: block; width: 100%; text-align: left;
+    background: transparent; color: var(--text); border: none; border-radius: 7px;
+    min-height: 26px; padding: 5px 10px; font-family: inherit; font-size: 11px; font-weight: 600;
+    cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    transition: background 0.1s ease, color 0.1s ease;
+  }
+  .wd-preset-item:hover, .wd-preset-item.active {
+    background: rgba(255, 126, 182, 0.16); color: var(--bocchi-pink-hi);
+  }
+  .wd-preset-item.selected {
+    box-shadow: inset 2px 0 0 var(--bocchi-pink);
+  }
   .meter-pill {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; color: var(--dim);
-    background: var(--well); padding: 4px 11px; border-radius: 999px;
-    border: 1px solid #24272e;
+    display: flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.04em; color: var(--dim);
+    background: var(--well); padding: 3px 6px; border-radius: 999px;
+    border: 1px solid var(--border); flex-shrink: 0;
   }
   .meter-pill.clip {
     border-color: var(--kita-red);
     box-shadow: 0 0 10px rgba(255, 107, 107, 0.35);
   }
   .meter-pill b {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--mono);
     color: var(--text); font-variant-numeric: tabular-nums;
-    min-width: 46px; text-align: right; font-weight: 700; font-size: 9.5px;
+    min-width: 40px; text-align: right; font-weight: 700; font-size: 10px;
   }
   .pill-bar {
-    position: relative; width: 64px; height: 5px;
+    position: relative; width: 32px; height: 5px;
     background: #1c1f26; border-radius: 999px; overflow: hidden;
   }
   .pill-sweet {
@@ -144,10 +204,10 @@
   }
   .pill-fill { height: 100%; width: 0%; background: var(--ryo-blue); border-radius: 999px; transition: width 0.04s linear; }
   .lvl-tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 8.5px; font-weight: 700; padding: 1.5px 6px; border-radius: 999px;
-    letter-spacing: 0.05em; background: #1c1f26; color: var(--dim);
-    min-width: 34px; text-align: center;
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 999px;
+    letter-spacing: 0.03em; background: #1c1f26; color: var(--dim);
+    min-width: 28px; text-align: center; font-variant-numeric: tabular-nums;
   }
   .lvl-tag.ideal { background: var(--blue-soft); color: var(--ryo-blue); }
   .lvl-tag.hot   { background: var(--yellow-soft); color: var(--nijika-yellow); }
@@ -156,45 +216,96 @@
   .btn-toggle {
     background: var(--well);
     color: var(--muted);
-    border: none;
+    border: 1px solid var(--border);
     border-radius: 999px;
-    padding: 4px 10px; font-size: 9px; font-weight: 700; letter-spacing: 0.07em;
+    min-width: 24px; min-height: 24px;
+    padding: 3px 7px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
     font-family: inherit;
-    cursor: pointer; text-transform: uppercase; transition: all 0.14s ease;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; text-transform: uppercase; transition: color 0.14s ease, background-color 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
   }
-  .btn-toggle:hover { color: var(--text); }
+  .hdr .btn-toggle { min-height: 26px; padding: 3px 8px; }
+  .btn-toggle:hover { color: var(--text); border-color: var(--border-hi); }
   .btn-toggle.on {
     background: var(--pink-soft);
     color: var(--bocchi-pink);
+    border-color: var(--bocchi-pink);
     box-shadow: 0 0 10px var(--pink-soft);
   }
   .btn-toggle.amber.on {
     background: var(--yellow-soft);
     color: var(--nijika-yellow);
+    border-color: var(--nijika-yellow);
     box-shadow: 0 0 10px var(--yellow-soft);
   }
   .btn-toggle.blue.on {
     background: var(--blue-soft);
     color: var(--ryo-blue);
+    border-color: var(--ryo-blue);
     box-shadow: 0 0 10px var(--blue-soft);
   }
   .btn-toggle.red.on {
     background: var(--red-soft);
     color: var(--kita-red);
+    border-color: var(--kita-red);
     box-shadow: 0 0 10px var(--red-soft);
   }
   .btn-toggle.ir-error {
     background: var(--red-soft);
     color: var(--kita-red);
+    border-color: var(--kita-red);
     box-shadow: 0 0 10px var(--red-soft);
   }
+
+  /* Persistent Non-Shifting Error & Confirmation Banners */
+  .ui-banner-anchor {
+    position: sticky; top: 8px; height: 0; margin-top: -6px;
+    align-self: stretch; flex-shrink: 0; overflow: visible; z-index: 9500;
+    pointer-events: none;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+    padding: 4px 2px 0 2px;
+  }
+  .ui-banner-anchor > * { pointer-events: auto; }
+  .ui-error-banner, .ir-confirm-banner {
+    position: relative; z-index: 9500; flex-shrink: 0;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    max-width: min(520px, calc(100% - 16px));
+    padding: 7px 11px; border-radius: 10px;
+    font-family: var(--mono); font-size: 11px; font-weight: 600;
+    color: var(--text); background: #26161a; border: 1px solid var(--kita-red);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.65);
+  }
+  .ir-confirm-banner {
+    align-self: center;
+    width: max-content;
+    background: #1b1e25; border-color: var(--nijika-yellow);
+  }
+  .ui-error-banner[hidden], .ir-confirm-banner[hidden] { display: none !important; }
+  .ui-banner-btn {
+    min-width: 24px; min-height: 24px; padding: 3px 8px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--well); color: var(--text);
+    font-family: inherit; font-size: 10px; font-weight: 700; cursor: pointer;
+  }
+  .ui-banner-btn.primary { border-color: var(--nijika-yellow); color: var(--nijika-yellow); background: var(--yellow-soft); }
+  .ui-banner-btn.danger { border-color: var(--kita-red); color: var(--kita-red); background: var(--red-soft); }
+
+  /* Clickable Background-Rig Summary Indicator */
+  .bg-rig-summary {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    width: 100%; min-height: 26px; padding: 3px 11px; flex-shrink: 0;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 999px;
+    color: var(--muted); font-family: inherit; font-size: 10px; font-weight: 600;
+    cursor: pointer; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .bg-rig-summary:hover { color: var(--text); border-color: var(--ryo-blue); }
+  .bg-rig-summary b { color: var(--ryo-blue); font-weight: 700; }
 
   /* Top Row: Acoustic Analyzer + Motor Dynamics Strip */
   .top-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 292px;
-    gap: 9px;
-    height: 152px;
+    gap: 8px;
+    height: 142px;
     flex-shrink: 0;
   }
 
@@ -206,21 +317,21 @@
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.40);
     overflow: hidden;
     display: flex; flex-direction: column;
-    padding: 7px 10px 8px 10px;
-    gap: 5px;
+    padding: 6px 10px 7px 10px;
+    gap: 4px;
   }
   .scope-hdr {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 0 2px; font-size: 9.5px; letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 0 2px; font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase;
     color: var(--muted); flex-shrink: 0;
   }
-  .scope-legend { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 9px; }
+  .scope-legend { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 10px; }
   .legend-dot {
-    display: inline-block; width: 10px; height: 3px; border-radius: 999px; vertical-align: middle; margin-right: 5px;
+    display: inline-block; width: 10px; height: 3px; border-radius: 999px; vertical-align: middle; margin-right: 4px;
   }
   .scope-badges {
-    font-family: 'JetBrains Mono', monospace;
-    display: flex; gap: 12px; font-variant-numeric: tabular-nums; font-size: 9px;
+    font-family: var(--mono);
+    display: flex; gap: 9px; font-variant-numeric: tabular-nums; font-size: 10px;
   }
   .scope-badges span { color: var(--dim); font-weight: 600; }
   .scope-badges span b { font-weight: 700; margin-left: 3px; }
@@ -238,28 +349,28 @@
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 8px 11px;
+    padding: 7px 10px;
     display: flex; flex-direction: column; justify-content: space-between;
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.40);
   }
   .card-title {
     font-family: 'Quicksand', 'Barlow', sans-serif;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.09em;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
     text-transform: uppercase; color: var(--text);
     display: flex; justify-content: space-between; align-items: center;
-    padding-bottom: 4px;
+    padding-bottom: 3px;
   }
   .telem-grid {
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; flex: 1; align-content: center;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 5px; flex: 1; align-content: center;
   }
   .telem-item {
-    background: var(--well); border-radius: 10px;
-    padding: 5px 8px; display: flex; flex-direction: column; gap: 2.5px;
+    background: var(--well); border: 1px solid var(--border); border-radius: 9px;
+    padding: 4px 7px; display: flex; flex-direction: column; gap: 2px;
   }
-  .telem-lbl { font-size: 8px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.07em; }
+  .telem-lbl { font-size: 10px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.04em; }
   .telem-val {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums;
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums;
   }
   .telem-bar { height: 3.5px; background: #1c1f26; border-radius: 999px; overflow: hidden; }
   .telem-fill { height: 100%; width: 15%; background: var(--nijika-yellow); border-radius: 999px; transition: width 0.06s linear; }
@@ -268,14 +379,17 @@
   .deck-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 9px;
-    height: 320px;
+    gap: 8px;
+    height: 332px;
     flex-shrink: 0;
+  }
+  #stage.has-bg-summary .deck-row {
+    height: 304px;
   }
   .bottom-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 9px;
+    gap: 8px;
     flex: 1;
     min-height: 0;
   }
@@ -284,7 +398,7 @@
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 8px 11px;
+    padding: 7px 10px;
     display: flex; flex-direction: column;
     justify-content: space-between;
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.40);
@@ -292,19 +406,57 @@
   }
   .module-hdr {
     display: flex; align-items: center; justify-content: space-between;
-    padding-bottom: 5px; margin-bottom: 4px;
-    flex-shrink: 0; gap: 4px;
+    padding-bottom: 4px; margin-bottom: 3px;
+    flex-shrink: 0; gap: 3px;
+  }
+  .module-title-wrap {
+    display: inline-flex; align-items: center; gap: 5px; min-width: 0;
   }
   .module-name {
     font-family: 'Quicksand', 'Barlow', sans-serif;
-    font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
     text-transform: uppercase; color: var(--text);
-    display: flex; align-items: center; gap: 7px; white-space: nowrap;
+    display: flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .bypass-badge {
+    font-family: var(--mono); font-size: 10px; font-weight: 700;
+    padding: 0 4px; border-radius: 999px; line-height: 1.4;
+    background: #2a2d36; color: var(--text); border: 1px solid var(--border);
+    letter-spacing: 0.02em; white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .bypass-badge[hidden] { display: none !important; }
+  .module-card.module-bypassed > :not(.module-hdr):not(:has(:focus-visible)),
+  .module-card.module-bypassed > :not(.module-hdr):has(:focus-visible) .knob > :not(.kv-input):not(:focus-within),
+  .module-card.module-bypassed > :not(.module-hdr):has(:focus-visible) .amp-telem-grid,
+  .module-card.module-bypassed > :not(.module-hdr):has(:focus-visible) .gate-meter-pill,
+  .module-card.module-bypassed > :not(.module-hdr):has(:focus-visible) .amp-sub-lbl,
+  .module-card.module-bypassed > :not(.module-hdr):has(:focus-visible) .sub-deck-lbl,
+  .module-card.module-bypassed > :not(.module-hdr):has(:focus-visible) .sub-deck span:not(:focus-visible),
+  .module-card.module-bypassed > :not(.module-hdr):has(:focus-visible) .amp-vsep,
+  .module-card.module-bypassed > :not(.module-hdr):has(:focus-visible) .mic-stage-canvas:not(:focus-visible),
+  .module-card.module-bypassed > .seg-group:has(:focus-visible) button:not(:focus-visible),
+  .module-card.module-bypassed > :not(.module-hdr):has(:focus-visible) .seg-group button:not(:focus-visible),
+  .module-card.module-bypassed > :not(.module-hdr):has(:focus-visible) :is(.sub-deck, .amp-sub-deck) .btn-toggle:not(:focus-visible) {
+    opacity: 0.42;
+    filter: grayscale(0.55);
+  }
+  .module-card.module-bypassed .module-name { opacity: 0.62; }
+  .sub-bypassed > :not(.amp-sub-hdr):not(.amp-ctrl-row):not(:has(:focus-visible)),
+  .sub-bypassed > :not(.amp-sub-hdr):not(.amp-ctrl-row):has(:focus-visible) .knob > :not(.kv-input):not(:focus-within),
+  .sub-bypassed .seg-group button:not(:focus-visible),
+  .mic-sub-bypassed .mic-stage-canvas:not(:focus-visible),
+  .mic-sub-bypassed .knob > :not(.kv-input):not(:focus-within),
+  .mic-sub-bypassed.seg-group button:not(:focus-visible),
+  .mic-sub-bypassed .seg-group button:not(:focus-visible),
+  .mic-sub-bypassed .btn-toggle:not(:focus-visible) {
+    opacity: 0.42;
+    filter: grayscale(0.55);
   }
   .module-dot {
     width: 7.5px; height: 7.5px; border-radius: 50%;
     background: var(--bocchi-pink);
     box-shadow: 0 0 8px var(--bocchi-pink);
+    flex-shrink: 0;
   }
   .module-dot.yellow {
     background: var(--nijika-yellow);
@@ -322,14 +474,16 @@
   /* Frameless Pill Segment Group */
   .seg-group {
     display: inline-flex; align-items: center;
-    background: var(--well);
-    border-radius: 999px; overflow: hidden; padding: 2.5px; gap: 2px;
+    background: var(--well); border: 1px solid var(--border);
+    border-radius: 999px; overflow: hidden; padding: 2px; gap: 1.5px;
   }
   .seg-group button {
-    background: transparent; color: var(--muted); border: none; outline: none;
-    padding: 3.5px 8px; font-size: 9px; font-weight: 700; font-family: inherit;
-    letter-spacing: 0.04em; border-radius: 999px; white-space: nowrap;
-    cursor: pointer; transition: all 0.14s ease;
+    background: transparent; color: var(--muted); border: none;
+    min-width: 24px; min-height: 24px;
+    padding: 2px 6px; font-size: 10px; font-weight: 700; font-family: inherit;
+    letter-spacing: 0.03em; border-radius: 999px; white-space: nowrap;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: color 0.14s ease, background-color 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
   }
   .seg-group button:hover { color: var(--text); }
   .seg-group button.on {
@@ -344,13 +498,18 @@
     background: var(--blue-soft); color: var(--ryo-blue);
     box-shadow: 0 2px 8px var(--blue-soft);
   }
-  #micModelSeg button, #micBModelSeg button { padding: 3px 5px; font-size: 8.5px; }
+  #micModelSeg button, #micBModelSeg button { min-width: 24px; min-height: 24px; padding: 2px 3.5px; font-size: 10px; }
+  #cardCabA .module-name, #cardCabB .module-name { letter-spacing: 0.03em; gap: 4px; }
+  #cardRoom .module-hdr { gap: 2px; }
+  #cardRoom .module-name { gap: 4px; letter-spacing: 0.01em; }
+  #roomTypeSeg button, #roomPanSeg button { min-width: 24px; min-height: 24px; padding: 2px 3px; font-size: 10px; letter-spacing: 0em; }
+  #cardRoom #roomBtn { min-height: 24px; padding: 2px 5px; }
   .seg-group.cab-strip {
     display: flex; flex-wrap: wrap; width: 100%; justify-content: space-between;
     border-radius: 10px; margin-bottom: 4px; flex-shrink: 0; padding: 2px; gap: 1.5px;
   }
   .seg-group.cab-strip button {
-    flex: 1 1 13%; text-align: center; padding: 2.5px 3.5px; font-size: 8px; letter-spacing: 0.015em;
+    flex: 1 1 13%; text-align: center; min-height: 24px; padding: 2px 3px; font-size: 10px; letter-spacing: 0.01em;
   }
   .module-card.ir-dragover {
     border-color: var(--bocchi-pink) !important;
@@ -372,16 +531,47 @@
   #cardCabB.ir-override .knob[data-param="cabBHiResDb"],
   #cardCabB.ir-override .knob[data-param="cabBBoxScale"],
   #cardCabB.ir-override .knob[data-param="cabBConeDamp"] {
-    opacity: 0.28;
     pointer-events: none;
+  }
+  #cardCabA.ir-override #micModelSeg:not(:has(:focus-visible)),
+  #cardCabA.ir-override #micModelSeg:has(:focus-visible) button:not(:focus-visible),
+  #cardCabA.ir-override #micBtn:not(:focus-visible),
+  #cardCabA.ir-override .knob[data-param="micOffAxis"]:not(:focus-visible),
+  #cardCabA.ir-override .knob[data-param="micOffAxis"]:focus-visible > *,
+  #cardCabA.ir-override .knob[data-param="micDrive"]:not(:focus-visible),
+  #cardCabA.ir-override .knob[data-param="micDrive"]:focus-visible > *,
+  #cardCabA.ir-override .knob[data-param="cabALoResDb"]:not(:focus-visible),
+  #cardCabA.ir-override .knob[data-param="cabALoResDb"]:focus-visible > *,
+  #cardCabA.ir-override .knob[data-param="cabAHiResDb"]:not(:focus-visible),
+  #cardCabA.ir-override .knob[data-param="cabAHiResDb"]:focus-visible > *,
+  #cardCabA.ir-override .knob[data-param="cabBoxScale"]:not(:focus-visible),
+  #cardCabA.ir-override .knob[data-param="cabBoxScale"]:focus-visible > *,
+  #cardCabA.ir-override .knob[data-param="cabConeDamp"]:not(:focus-visible),
+  #cardCabA.ir-override .knob[data-param="cabConeDamp"]:focus-visible > *,
+  #cardCabB.ir-override #micBModelSeg:not(:has(:focus-visible)),
+  #cardCabB.ir-override #micBModelSeg:has(:focus-visible) button:not(:focus-visible),
+  #cardCabB.ir-override #micBBtn:not(:focus-visible),
+  #cardCabB.ir-override .knob[data-param="micBOffAxis"]:not(:focus-visible),
+  #cardCabB.ir-override .knob[data-param="micBOffAxis"]:focus-visible > *,
+  #cardCabB.ir-override .knob[data-param="micBDrive"]:not(:focus-visible),
+  #cardCabB.ir-override .knob[data-param="micBDrive"]:focus-visible > *,
+  #cardCabB.ir-override .knob[data-param="cabBLoResDb"]:not(:focus-visible),
+  #cardCabB.ir-override .knob[data-param="cabBLoResDb"]:focus-visible > *,
+  #cardCabB.ir-override .knob[data-param="cabBHiResDb"]:not(:focus-visible),
+  #cardCabB.ir-override .knob[data-param="cabBHiResDb"]:focus-visible > *,
+  #cardCabB.ir-override .knob[data-param="cabBBoxScale"]:not(:focus-visible),
+  #cardCabB.ir-override .knob[data-param="cabBBoxScale"]:focus-visible > *,
+  #cardCabB.ir-override .knob[data-param="cabBConeDamp"]:not(:focus-visible),
+  #cardCabB.ir-override .knob[data-param="cabBConeDamp"]:focus-visible > * {
+    opacity: 0.28;
     filter: grayscale(0.75);
   }
 
   /* Cabinet Body Split: Left Interactive Speaker Stage + Right Controls */
   .cab-body {
     display: grid;
-    grid-template-columns: 206px minmax(0, 1fr);
-    gap: 9px;
+    grid-template-columns: 186px minmax(0, 1fr);
+    gap: 8px;
     flex: 1;
     min-height: 0;
   }
@@ -405,20 +595,29 @@
 
   .cab-controls {
     display: flex; flex-direction: column; justify-content: space-between;
-    gap: 6px; min-width: 0; min-height: 0;
+    gap: 5px; min-width: 0; min-height: 0;
   }
   .sub-deck {
     background: var(--well);
-    border: 1px solid #24272f;
+    border: 1px solid var(--border);
     border-radius: 11px;
-    padding: 5px 6px 4px 6px;
+    padding: 4px 6px 3px 6px;
     display: flex; flex-direction: column;
     flex: 1; justify-content: center; min-width: 0; min-height: 0;
   }
   .sub-deck-lbl {
-    font-size: 8px; font-weight: 700; letter-spacing: 0.10em;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
     color: var(--dim); text-transform: uppercase;
-    margin-bottom: 2px; padding-left: 4px; flex-shrink: 0;
+    margin-bottom: 2px; padding-left: 3px; flex-shrink: 0;
+  }
+  #micPreModelSeg button, #micBPreModelSeg button {
+    min-width: 24px; min-height: 24px; padding: 2px 4px; font-size: 10px;
+  }
+  #cabADeltaBtn, #cabBDeltaBtn {
+    min-width: 24px; min-height: 24px; padding: 2px 5px; font-size: 10px;
+  }
+  #cabACutOrderSeg button, #cabBCutOrderSeg button {
+    min-width: 28px; min-height: 24px; padding: 2px 6px; font-size: 10px;
   }
 
   .knob-row {
@@ -427,19 +626,130 @@
   }
   .knob {
     display: flex; flex-direction: column; align-items: center;
-    cursor: ns-resize; min-width: 44px; flex: 1 1 0;
+    cursor: ns-resize; min-width: 42px; flex: 1 1 0;
+    border-radius: 8px; padding: 1px 0; transition: background 0.12s ease, box-shadow 0.12s ease;
+  }
+  .knob:hover, .knob.dragging {
+    background: rgba(110, 198, 255, 0.07);
+    box-shadow: inset 0 0 0 1px rgba(110, 198, 255, 0.35);
   }
   .kl {
-    font-size: 8.5px; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5px;
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.01em; margin-bottom: 1px;
     text-align: center; white-space: nowrap;
   }
   .kv {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; font-weight: 700; color: var(--bocchi-pink);
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 700; color: var(--bocchi-pink);
     font-variant-numeric: tabular-nums;
-    margin-top: 1.5px;
-    min-height: 11px; text-align: center; white-space: nowrap;
+    margin-top: 1px;
+    min-height: 12px; text-align: center; white-space: nowrap;
+  }
+  .kv-input {
+    width: 52px; height: 18px; padding: 0 3px; border-radius: 4px;
+    border: 1px solid var(--ryo-blue); background: var(--well); color: var(--text);
+    font-family: var(--mono); font-size: 10px; font-weight: 700; text-align: center;
+    user-select: text; -webkit-user-select: text;
+  }
+  #cabBKnobsBot .knob { min-width: 40px; }
+  #cabBKnobsBot .kv { font-size: 10px; }
+  #roomKnobsAll { gap: 1px; }
+  #roomKnobsAll .knob { min-width: 42px; }
+  #roomKnobsAll .kl { font-size: 10px; letter-spacing: 0em; }
+  #roomKnobsAll .kv { font-size: 10px; }
+
+  /* Full WD Amp, Studio FX Loop & Expanded WD Load Rack */
+  #cardLoadGateBoost, #cardPreamp, #cardFullPower, #cardFxLoop {
+    justify-content: flex-start;
+  }
+  #cardLoadGateBoost .module-hdr, #cardPreamp .module-hdr,
+  #cardFullPower .module-hdr, #cardFxLoop .module-hdr {
+    padding-bottom: 3px; margin-bottom: 3px; gap: 4px;
+  }
+  .amp-deck-stack {
+    display: flex; flex-direction: column; gap: 4px; flex: 1; min-height: 0;
+  }
+  .amp-sub-deck {
+    background: var(--well); border: 1px solid var(--border); border-radius: 11px;
+    padding: 4px 6px; display: flex; flex-direction: column; min-width: 0; min-height: 0;
+  }
+  .amp-sub-hdr {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 4px; margin-bottom: 2px; flex-shrink: 0;
+  }
+  .amp-ctrl-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 4px; margin-bottom: 2px; flex-shrink: 0;
+  }
+  .amp-seg-compact { padding: 2px; gap: 1.5px; }
+  .amp-seg-compact button { min-width: 24px; min-height: 24px; padding: 2px 5px; font-size: 10px; letter-spacing: 0.01em; }
+  .amp-sel { max-width: 130px; min-height: 24px; padding: 2px 6px; font-size: 10px; }
+  .gate-meter-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 999px;
+    padding: 2px 6px; font-size: 10px; font-weight: 700; color: var(--muted);
+    flex-shrink: 0;
+  }
+  .gate-meter-pill b {
+    font-family: var(--mono); color: var(--ryo-blue);
+    font-variant-numeric: tabular-nums; font-size: 10px; min-width: 40px; text-align: right;
+  }
+  .amp-vsep {
+    width: 1px; align-self: stretch; margin: 3px 2px; background: var(--border); flex-shrink: 0;
+  }
+  .amp-telem-grid {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px; flex: 1; align-items: center; min-height: 0;
+  }
+  .amp-telem-pill {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 9px;
+    padding: 4px 7px; display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  }
+  #cardFullPower .module-name { gap: 4px; letter-spacing: 0.04em; }
+  #ampPowerTubeSeg button, #rectifierSeg button {
+    min-width: 24px; min-height: 24px; padding: 2px 5px; font-size: 10px; letter-spacing: 0.01em;
+  }
+  #cardFullPower #powerAmpBtn { min-height: 24px; padding: 2px 7px; }
+  #powerKnobs { gap: 1px; }
+  #powerKnobs .knob { min-width: 42px; }
+  @media (min-width: 1180px) and (min-height: 760px) {
+    body:not(.wd-web-compact) #powerKnobs .knob[data-param="impRatio"] { flex: 1.22 1 0; min-width: 66px; }
+  }
+  #powerKnobs .kl { font-size: 10px; letter-spacing: 0em; }
+  #powerKnobs .kv { font-size: 10px; }
+  #loadKnobs .knob, #gateKnobs .knob, #boostKnobs .knob { min-width: 42px; }
+  #loadKnobs .kl, #gateKnobs .kl, #boostKnobs .kl { font-size: 10px; letter-spacing: 0em; }
+  #loadKnobs .kv, #gateKnobs .kv, #boostKnobs .kv { font-size: 10px; }
+  #fxLoopKnobs, #preampKnobs { flex: 1; }
+
+  @media (max-width: 920px), (max-width: 1179px), (max-height: 759px) {
+    #stage {
+      position: fixed; left: 0; top: 0; width: 100%; height: 100%;
+      transform: none; border-radius: 0; padding: 8px; gap: 8px;
+      overflow-y: auto; overflow-x: hidden;
+    }
+    .ui-banner-anchor { margin-top: -8px; }
+    .hdr { height: auto; flex-wrap: wrap; border-radius: 14px; padding: 6px 8px; gap: 6px; white-space: normal; }
+    .brand, .hdr-right { flex-wrap: wrap; white-space: normal; max-width: 100%; gap: 4px; }
+    .top-row, .deck-row, .bottom-row, #stage.has-bg-summary .deck-row {
+      grid-template-columns: minmax(0, 1fr); height: auto; flex: 0 0 auto;
+    }
+    .scope-box { min-height: 155px; }
+    .scope-hdr, .scope-legend, .scope-badges { flex-wrap: wrap; gap: 6px; }
+    .module-card { overflow: visible; height: auto; flex: 0 0 auto; }
+    .module-hdr, .module-hdr > div, .amp-ctrl-row, .amp-sub-hdr, .seg-group { flex-wrap: wrap; gap: 4px; }
+    .cab-body { grid-template-columns: minmax(0, 1fr); }
+    .mic-stage-wrap { min-height: 210px; }
+    .knob-row { flex-wrap: wrap; justify-content: flex-start; gap: 6px 4px; }
+    .knob { flex: 0 1 calc(25% - 4px); min-width: 58px; }
+    .amp-telem-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bg-rig-summary { white-space: normal; border-radius: 10px; padding: 5px 10px; }
+    .amp-sub-deck, .sub-deck { flex: 0 0 auto !important; min-height: auto; }
+  }
+  @media (max-width: 520px) {
+    .knob { flex: 0 1 calc(33.33% - 4px); }
+    .hdr-preset-sel { max-width: 100%; }
+    .seg-group.cab-strip button { flex: 1 1 auto; min-width: max-content; padding: 2px 6px; }
   }
 </style>
 </head>
@@ -454,12 +764,28 @@
         <i class="kessoku-dot yellow"></i>
         <i class="kessoku-dot red"></i>
       </span>
-      <div class="brand-title">WD CAB</div>
-      <span class="brand-tag">REACTIVE CABINET &amp; MIC STUDIO</span>
+      <div class="brand-title" id="brandTitle">WD CAB</div>
+      <div id="rigModeSeg" class="seg-group hdr-pill-group" title="Rig View &amp; Full Amp Mode">
+        <button data-mode="cab" class="on" title="WD Cab Mode — Dual Speaker Cab, Mic &amp; Room Engine (Full Amp bypassed)">CAB ONLY</button>
+        <button data-mode="amp" title="WD Amp Mode — Full Tube Amp, Studio FX Loop &amp; Expanded WD Load">AMP &amp; LOAD</button>
+        <button data-mode="ampcab" class="blue" title="Full Amp Active + Dual Cab &amp; Room Editor">AMP + CABS</button>
+      </div>
       <div class="brand-sub">Werewolf Dynamics</div>
     </div>
     <div class="hdr-right">
-      <select id="rigPresetSel" class="hdr-preset-sel" title="Factory Rig Presets (clears User IRs)">
+      <div class="seg-group hdr-pill-group" id="abSlotGroup" title="Instant A/B Rig Compare">
+        <button id="abSlotABtn" class="on" title="Select Rig Slot A" aria-label="Select Rig Slot A">A</button>
+        <button id="abSlotBBtn" class="amber" title="Select Rig Slot B" aria-label="Select Rig Slot B">B</button>
+        <button id="abCopyBtn" title="Copy active Rig Slot to the other slot" aria-label="Copy active Rig Slot to other slot">COPY</button>
+      </div>
+      <span class="hdr-sep" aria-hidden="true"></span>
+      <div class="seg-group hdr-pill-group" id="presetIoGroup" title="Save or Load portable .wdcab / .xml Rig Presets">
+        <button id="presetSaveBtn" title="Save current Rig &amp; A/B state to .wdcab file" aria-label="Save Rig Preset">SAVE</button>
+        <button id="presetLoadBtn" title="Load .wdcab or .xml preset file" aria-label="Load Rig Preset">LOAD</button>
+      </div>
+      <span class="hdr-sep" aria-hidden="true"></span>
+      <select id="rigPresetSel" class="hdr-preset-sel" aria-label="Factory Rig Presets" title="Factory Rig Presets (prompts before clearing User IRs)">
+        <option value="" disabled hidden selected>Custom / Edited</option>
         <option value="0">1. Studio Blend · 4x12 Pair</option>
         <option value="1">2. Tight Modern Metal</option>
         <option value="2">3. Plexi Greenback Stack</option>
@@ -489,6 +815,19 @@
     </div>
   </div>
 
+  <!-- Non-shifting Persistent Error & Confirmation Banners -->
+  <div class="ui-banner-anchor">
+    <div id="uiErrorBanner" class="ui-error-banner" role="alert" aria-live="assertive" hidden>
+      <span id="uiErrorText"></span>
+      <button type="button" id="uiErrorDismissBtn" class="ui-banner-btn danger" aria-label="Dismiss error">Dismiss</button>
+    </div>
+    <div id="irConfirmBanner" class="ir-confirm-banner" role="alertdialog" aria-modal="false" aria-label="Confirm clearing User IRs" hidden>
+      <span id="irConfirmText">Loading a factory preset clears active User IRs.</span>
+      <button type="button" id="irConfirmProceedBtn" class="ui-banner-btn primary">Load Preset &amp; Clear IRs</button>
+      <button type="button" id="irConfirmCancelBtn" class="ui-banner-btn">Cancel</button>
+    </div>
+  </div>
+
   <!-- Top Row: Acoustic Analyzer + Motor Status -->
   <div class="top-row">
     <div class="scope-box">
@@ -514,7 +853,7 @@
     <div class="telem-card">
       <div class="card-title">
         <span style="display:flex;align-items:center;gap:6px"><i class="module-dot yellow" style="width:6.5px;height:6.5px"></i>SPEAKER MOTOR DYNAMICS</span>
-        <span id="sagBadge" class="mono" style="color:var(--nijika-yellow);font-size:9.5px">8&Omega; Match</span>
+        <span id="sagBadge" class="mono" style="color:var(--nijika-yellow);font-size:10px">8&Omega; Match</span>
       </div>
       <div class="telem-grid">
         <div class="telem-item">
@@ -541,14 +880,17 @@
     </div>
   </div>
 
+  <!-- Clickable Background-Rig Summary Bar (visible in AMP & LOAD and AMP + CABS modes) -->
+  <button type="button" id="bgRigSummaryBtn" class="bg-rig-summary" style="display:none" title="Click to switch between AMP &amp; LOAD and AMP + CABS views"></button>
+
   <!-- Middle Row: Dual Cabinet & Interactive Speaker/Mic Stage -->
-  <div class="deck-row">
+  <div class="deck-row" id="cabDeckRow">
     <!-- Cabinet A -->
     <div class="module-card" id="cardCabA">
       <div class="module-hdr" style="padding-bottom:3px;margin-bottom:2px">
-        <span class="module-name"><i class="module-dot"></i>CABINET A</span>
-        <div style="display:flex;gap:4px;align-items:center">
-          <span style="font-size:8px;font-weight:700;color:var(--dim);letter-spacing:0.08em">MIC</span>
+        <span class="module-title-wrap"><span class="module-name"><i class="module-dot"></i>CABINET A</span><span class="bypass-badge" id="bypassBadgeCabA" hidden>BYPASSED</span></span>
+        <div style="display:flex;gap:3px;align-items:center">
+          <span style="font-size:10px;font-weight:700;color:var(--dim);letter-spacing:0.05em">MIC</span>
           <div id="micModelSeg" class="seg-group blue-seg">
             <button data-idx="0" class="on" title="57 — Unidyne III Cardioid Dynamic">57</button>
             <button data-idx="1" title="121 — Figure-8 Velocity Ribbon">121</button>
@@ -559,11 +901,11 @@
             <button data-idx="6" title="906 — Flat-Face Supercardioid Dynamic">906</button>
             <button data-idx="7" title="414 — Large-Diaphragm Multi-Pattern Condenser">414</button>
           </div>
-          <button id="irLoadABtn" class="btn-toggle" title="Load Custom .wav Impulse Response for Cab A (keeps Speaker Motor &amp; Console Preamp active)">IR</button>
-          <button id="irClearABtn" class="btn-toggle red" style="display:none;padding:3px 6px" title="Clear Custom Cab A IR">&times;</button>
+          <button id="irLoadABtn" class="btn-toggle" aria-label="Load Custom Cab A Impulse Response" title="Load Custom .wav Impulse Response for Cab A (keeps Speaker Motor &amp; Console Preamp active)">IR</button>
+          <button id="irClearABtn" class="btn-toggle red" style="display:inline-flex;visibility:hidden;pointer-events:none" tabindex="-1" aria-hidden="true" aria-label="Clear Custom Cab A Impulse Response" title="Clear Custom Cab A IR">&times;</button>
           <button id="cabBtn" class="btn-toggle on">CAB</button>
           <button id="micBtn" class="btn-toggle blue on">MIC</button>
-          <button id="micPhaseBtn" class="btn-toggle red" title="Mic A Phase Invert (180° Polarity Flip)">Ø</button>
+          <button id="micPhaseBtn" class="btn-toggle red" aria-label="Mic A Phase Invert (180 degrees)" title="Mic A Phase Invert (180° Polarity Flip)">Ø</button>
         </div>
       </div>
       <div id="cabModelSeg" class="seg-group cab-strip">
@@ -583,26 +925,38 @@
       </div>
 
       <div class="cab-body">
-        <div class="mic-stage-wrap" id="micStageWrapA" title="Drag microphone across the speaker cone (center = 0% Dust Cap, out = 100% Cone Edge) and away from the grille (top = 0.5 cm on grille, bottom = 50 cm). Mouse wheel tilts Off-Axis Angle. Double-click to reset.">
+        <div class="mic-stage-wrap" id="micStageWrapA" title="Active right half: drag mic across cone (0% Dust Cap to 100% Edge) and depth (0.5 cm to 50 cm). Drop .wav here to load User IR. Wheel or [ / ] adjusts Angle. Double-click or Delete resets.">
           <canvas class="mic-stage-canvas" id="micStageA"></canvas>
         </div>
         <div class="cab-controls">
-          <div class="sub-deck">
+          <div class="sub-deck" id="subDeckMicA">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
               <div class="sub-deck-lbl" style="margin-bottom:0">Mic &amp; Preamp</div>
-              <div id="micPreModelSeg" class="seg-group" title="Analog Suite Mic Preamp Model (Clean / Neve 73 / API 12 / V76 Tube / EMI REDD.47 / Tascam Porta)">
-                <button data-idx="0" title="Clean — Transformerless Electronically Balanced Solid-State Preamp">Clean</button>
-                <button data-idx="1" class="on" title="73 — Neve 1073 Class-A + Marinair LO1166 J-A Output Iron">73</button>
-                <button data-idx="2" title="12 — API 312/512c 2520 Discrete Op-Amp + 2503 Output Iron">12</button>
-                <button data-idx="3" title="76 — TAB V76 Dual-EF804S Pentode Feedback Ladder + Broadcast Iron">76</button>
-                <button data-idx="4" title="REDD — EMI REDD.47 EF86 Pentode + Abbey Road Iron">REDD</button>
-                <button data-idx="5" title="Porta — Tascam 388/244 Discrete Pair + Console Bus Op-Amp">Porta</button>
+              <div style="display:flex;gap:3px;align-items:center">
+                <div id="micPreModelSeg" class="seg-group" title="Analog Suite Mic Preamp Model (Clean / Neve 73 / API 12 / V76 Tube / EMI REDD.47 / Tascam Porta)">
+                  <button data-idx="0" title="Clean — Transformerless Electronically Balanced Solid-State Preamp">Clean</button>
+                  <button data-idx="1" class="on" title="73 — Neve 1073 Class-A + Marinair LO1166 J-A Output Iron">73</button>
+                  <button data-idx="2" title="12 — API 312/512c 2520 Discrete Op-Amp + 2503 Output Iron">12</button>
+                  <button data-idx="3" title="76 — TAB V76 Dual-EF804S Pentode Feedback Ladder + Broadcast Iron">76</button>
+                  <button data-idx="4" title="REDD — EMI REDD.47 EF86 Pentode + Abbey Road Iron">REDD</button>
+                  <button data-idx="5" title="Porta — Tascam 388/244 Discrete Pair + Console Bus Op-Amp">Porta</button>
+                </div>
+                <button id="cabADeltaBtn" class="btn-toggle amber" aria-pressed="false" aria-label="Cab A Color Delta Monitor" title="Cab A Color Delta (Δ) — Phase-locked audition of Cab A speaker motor, cone cry, mic capsule/iron &amp; preamp nonlinearities (non-persistent)">Δ</button>
               </div>
             </div>
             <div class="knob-row" id="cabAKnobsBot"></div>
           </div>
           <div class="sub-deck">
-            <div class="sub-deck-lbl">Speaker Voicing &amp; Filters</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+              <div class="sub-deck-lbl" style="margin-bottom:0">Speaker Voicing &amp; Filters</div>
+              <div style="display:flex;gap:4px;align-items:center">
+                <span style="font-size:10px;font-weight:700;color:var(--dim);letter-spacing:0.04em">CUTS</span>
+                <div id="cabACutOrderSeg" class="seg-group blue-seg" title="Cab A Low/High Cut Placement (Pre-Preamp vs Post-Preamp)">
+                  <button data-idx="0" class="on" title="Pre-Preamp — Low/High Cut shapes cab signal before Mic &amp; Preamp saturation">PRE</button>
+                  <button data-idx="1" title="Post-Preamp — Low/High Cut filters output after Mic &amp; Preamp saturation">POST</button>
+                </div>
+              </div>
+            </div>
             <div class="knob-row" id="cabAKnobsTop"></div>
           </div>
         </div>
@@ -612,9 +966,9 @@
     <!-- Cabinet B -->
     <div class="module-card" id="cardCabB">
       <div class="module-hdr" style="padding-bottom:3px;margin-bottom:2px">
-        <span class="module-name"><i class="module-dot yellow"></i>CABINET B</span>
-        <div style="display:flex;gap:4px;align-items:center">
-          <span style="font-size:8px;font-weight:700;color:var(--dim);letter-spacing:0.08em">MIC</span>
+        <span class="module-title-wrap"><span class="module-name"><i class="module-dot yellow"></i>CABINET B</span><span class="bypass-badge" id="bypassBadgeCabB" hidden>BYPASSED</span></span>
+        <div style="display:flex;gap:3px;align-items:center">
+          <span style="font-size:10px;font-weight:700;color:var(--dim);letter-spacing:0.05em">MIC</span>
           <div id="micBModelSeg" class="seg-group blue-seg">
             <button data-idx="0" title="57 — Unidyne III Cardioid Dynamic">57</button>
             <button data-idx="1" class="on" title="121 — Figure-8 Velocity Ribbon">121</button>
@@ -625,11 +979,11 @@
             <button data-idx="6" title="906 — Flat-Face Supercardioid Dynamic">906</button>
             <button data-idx="7" title="414 — Large-Diaphragm Multi-Pattern Condenser">414</button>
           </div>
-          <button id="irLoadBBtn" class="btn-toggle" title="Load Custom .wav Impulse Response for Cab B (keeps Speaker Motor &amp; Console Preamp active)">IR</button>
-          <button id="irClearBBtn" class="btn-toggle red" style="display:none;padding:3px 6px" title="Clear Custom Cab B IR">&times;</button>
+          <button id="irLoadBBtn" class="btn-toggle" aria-label="Load Custom Cab B Impulse Response" title="Load Custom .wav Impulse Response for Cab B (keeps Speaker Motor &amp; Console Preamp active)">IR</button>
+          <button id="irClearBBtn" class="btn-toggle red" style="display:inline-flex;visibility:hidden;pointer-events:none" tabindex="-1" aria-hidden="true" aria-label="Clear Custom Cab B Impulse Response" title="Clear Custom Cab B IR">&times;</button>
           <button id="cabBBtn" class="btn-toggle amber on">CAB</button>
           <button id="micBBtn" class="btn-toggle blue on">MIC</button>
-          <button id="micBPhaseBtn" class="btn-toggle red" title="Mic B Phase Invert (180° Polarity Flip)">Ø</button>
+          <button id="micBPhaseBtn" class="btn-toggle red" aria-label="Mic B Phase Invert (180 degrees)" title="Mic B Phase Invert (180° Polarity Flip)">Ø</button>
         </div>
       </div>
       <div id="cabBModelSeg" class="seg-group yellow-seg cab-strip">
@@ -649,26 +1003,38 @@
       </div>
 
       <div class="cab-body">
-        <div class="mic-stage-wrap" id="micStageWrapB" title="Drag microphone across the speaker cone (center = 0% Dust Cap, out = 100% Cone Edge) and away from the grille (top = 0.5 cm on grille, bottom = 50 cm). Mouse wheel tilts Off-Axis Angle. Double-click to reset.">
+        <div class="mic-stage-wrap" id="micStageWrapB" title="Active right half: drag mic across cone (0% Dust Cap to 100% Edge) and depth (0.5 cm to 50 cm). Drop .wav here to load User IR. Wheel or [ / ] adjusts Angle. Double-click or Delete resets.">
           <canvas class="mic-stage-canvas" id="micStageB"></canvas>
         </div>
         <div class="cab-controls">
-          <div class="sub-deck">
+          <div class="sub-deck" id="subDeckMicB">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
               <div class="sub-deck-lbl" style="margin-bottom:0">Mic &amp; Preamp</div>
-              <div id="micBPreModelSeg" class="seg-group yellow-seg" title="Analog Suite Mic Preamp Model (Clean / Neve 73 / API 12 / V76 Tube / EMI REDD.47 / Tascam Porta)">
-                <button data-idx="0" title="Clean — Transformerless Electronically Balanced Solid-State Preamp">Clean</button>
-                <button data-idx="1" title="73 — Neve 1073 Class-A + Marinair LO1166 J-A Output Iron">73</button>
-                <button data-idx="2" class="on" title="12 — API 312/512c 2520 Discrete Op-Amp + 2503 Output Iron">12</button>
-                <button data-idx="3" title="76 — TAB V76 Dual-EF804S Pentode Feedback Ladder + Broadcast Iron">76</button>
-                <button data-idx="4" title="REDD — EMI REDD.47 EF86 Pentode + Abbey Road Iron">REDD</button>
-                <button data-idx="5" title="Porta — Tascam 388/244 Discrete Pair + Console Bus Op-Amp">Porta</button>
+              <div style="display:flex;gap:3px;align-items:center">
+                <div id="micBPreModelSeg" class="seg-group yellow-seg" title="Analog Suite Mic Preamp Model (Clean / Neve 73 / API 12 / V76 Tube / EMI REDD.47 / Tascam Porta)">
+                  <button data-idx="0" title="Clean — Transformerless Electronically Balanced Solid-State Preamp">Clean</button>
+                  <button data-idx="1" title="73 — Neve 1073 Class-A + Marinair LO1166 J-A Output Iron">73</button>
+                  <button data-idx="2" class="on" title="12 — API 312/512c 2520 Discrete Op-Amp + 2503 Output Iron">12</button>
+                  <button data-idx="3" title="76 — TAB V76 Dual-EF804S Pentode Feedback Ladder + Broadcast Iron">76</button>
+                  <button data-idx="4" title="REDD — EMI REDD.47 EF86 Pentode + Abbey Road Iron">REDD</button>
+                  <button data-idx="5" title="Porta — Tascam 388/244 Discrete Pair + Console Bus Op-Amp">Porta</button>
+                </div>
+                <button id="cabBDeltaBtn" class="btn-toggle amber" aria-pressed="false" aria-label="Cab B Color Delta Monitor" title="Cab B Color Delta (Δ) — Phase-locked audition of Cab B speaker motor, cone cry, mic capsule/iron &amp; preamp nonlinearities (non-persistent)">Δ</button>
               </div>
             </div>
             <div class="knob-row" id="cabBKnobsBot"></div>
           </div>
           <div class="sub-deck">
-            <div class="sub-deck-lbl">Speaker Voicing &amp; Filters</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+              <div class="sub-deck-lbl" style="margin-bottom:0">Speaker Voicing &amp; Filters</div>
+              <div style="display:flex;gap:4px;align-items:center">
+                <span style="font-size:10px;font-weight:700;color:var(--dim);letter-spacing:0.04em">CUTS</span>
+                <div id="cabBCutOrderSeg" class="seg-group yellow-seg" title="Cab B Low/High Cut Placement (Pre-Preamp vs Post-Preamp)">
+                  <button data-idx="0" class="on" title="Pre-Preamp — Low/High Cut shapes cab signal before Mic &amp; Preamp saturation">PRE</button>
+                  <button data-idx="1" title="Post-Preamp — Low/High Cut filters output after Mic &amp; Preamp saturation">POST</button>
+                </div>
+              </div>
+            </div>
             <div class="knob-row" id="cabBKnobsTop"></div>
           </div>
         </div>
@@ -677,16 +1043,16 @@
   </div>
 
   <!-- Bottom Row: Amp Coupling & Speaker Motor | Studio Room & Master Output -->
-  <div class="bottom-row">
+  <div class="bottom-row" id="cabBottomRow">
     <!-- Amp Coupling & Speaker Motor -->
     <div class="module-card" id="cardPower">
       <div class="module-hdr">
         <span class="module-name"><i class="module-dot red"></i>AMP COUPLING &amp; SPEAKER MOTOR</span>
-        <div style="display:flex;gap:6px;align-items:center">
-          <span style="font-size:9px;color:var(--dim);letter-spacing:0.07em;font-weight:700">AMP DAMPING</span>
-          <div id="powerTubeSeg" class="seg-group yellow-seg" title="Power Amp Output Impedance Mode: Tight (Low-Z 6L6 damping) vs Loose (Hi-Z EL34 current source)">
-            <button class="on">Tight (Low-Z)</button>
-            <button>Loose (Hi-Z)</button>
+        <div style="display:flex;gap:5px;align-items:center">
+          <span style="font-size:10px;color:var(--dim);letter-spacing:0.04em;font-weight:700">TUBE / DAMPING</span>
+          <div id="powerTubeSeg" class="seg-group yellow-seg" title="Power Amp Output Tube &amp; Damping Mode: 6L6 · Tight (Low-Z) vs EL34 · Loose (Hi-Z)">
+            <button class="on">6L6 · Tight</button>
+            <button>EL34 · Loose</button>
           </div>
         </div>
       </div>
@@ -696,8 +1062,8 @@
     <!-- Studio Room & Output -->
     <div class="module-card" id="cardRoom">
       <div class="module-hdr">
-        <span class="module-name"><i class="module-dot blue"></i>STUDIO ROOM &amp; OUTPUT</span>
-        <div style="display:flex;gap:5px;align-items:center">
+        <span class="module-title-wrap"><span class="module-name"><i class="module-dot blue"></i>ROOM &amp; OUTPUT</span><span class="bypass-badge" id="bypassBadgeRoom" hidden>BYPASSED</span></span>
+        <div style="display:flex;gap:3px;align-items:center">
           <div id="roomTypeSeg" class="seg-group blue-seg">
             <button>Iso Booth</button>
             <button class="on">Wood Room</button>
@@ -716,25 +1082,170 @@
     </div>
   </div>
 
-  <!-- Hidden Compatibility Relays (keeps all 75 APVTS WebView2 relays bound cleanly) -->
+  <!-- Full Amp Deck Row: WD Load + Gate & OD | Tube Preamp & Telemetry -->
+  <div class="deck-row" id="ampDeckRow" style="display:none">
+    <!-- WD Load + Gate & Overdrive -->
+    <div class="module-card" id="cardLoadGateBoost">
+      <div class="module-hdr">
+        <span class="module-title-wrap"><span class="module-name"><i class="module-dot blue"></i>WD LOAD &amp; FRONT END</span><span class="bypass-badge" id="bypassBadgeFrontEnd" hidden>BYPASSED</span></span>
+        <div style="display:flex;gap:3px;align-items:center">
+          <select id="loadCouplingSel" class="hdr-preset-sel amp-sel" aria-label="Load Coupling Profile" title="Capture Interface &amp; Pedalboard HI-Z Coupling Profile">
+            <option value="0">Direct · 1M DI</option>
+            <option value="1">True-Bypass · 1M DI</option>
+            <option value="2">Buffered Chain</option>
+            <option value="3">Direct · Vintage 470k DI</option>
+            <option value="4">Direct · Active 10M DI</option>
+            <option value="5">Absolute (Raw Pickup)</option>
+          </select>
+          <div id="reactiveSeg" class="seg-group blue-seg amp-seg-compact" title="Reactive Guitar Input Q Damping">
+            <button data-idx="0">Off</button>
+            <button data-idx="1" class="on">React Q</button>
+          </div>
+          <button id="loadBtn" class="btn-toggle blue" title="Enable WD Load Reactive Pickup, Cable &amp; Tone Network">LOAD</button>
+        </div>
+      </div>
+      <div class="amp-deck-stack">
+        <div class="amp-sub-deck" id="subDeckLoad" style="flex:1.25">
+          <div class="amp-ctrl-row">
+            <div id="loadPickupSeg" class="seg-group blue-seg amp-seg-compact" title="Guitar Pickup Winding &amp; Inductance Voicing">
+              <button data-idx="0" class="on">Single</button>
+              <button data-idx="1">Hot SC</button>
+              <button data-idx="2">P-90</button>
+              <button data-idx="3">PAF</button>
+              <button data-idx="4">Hi-Out</button>
+            </div>
+            <div id="loadWiringSeg" class="seg-group amp-seg-compact" title="Guitar Potentiometer Wiring Topology">
+              <button data-idx="0" class="on">Mod</button>
+              <button data-idx="1">'50s</button>
+            </div>
+          </div>
+          <div class="amp-ctrl-row">
+            <div id="loadBleedSeg" class="seg-group amp-seg-compact" title="Volume Pot Treble Bleed Network">
+              <button data-idx="0" class="on">Off</button>
+              <button data-idx="1">Cap</button>
+              <button data-idx="2">R||C</button>
+              <button data-idx="3">R+C</button>
+            </div>
+            <div id="loadCableSeg" class="seg-group yellow-seg amp-seg-compact" title="Instrument Cable Capacitance &amp; Coiled Inductance Preset">
+              <button data-idx="0" class="on">100pF</button>
+              <button data-idx="1">65pF</button>
+              <button data-idx="2">Coiled</button>
+            </div>
+          </div>
+          <div class="knob-row" id="loadKnobs"></div>
+        </div>
+        <div class="amp-sub-deck" style="flex:1">
+          <div class="amp-sub-hdr">
+            <div style="display:flex;gap:3px;align-items:center">
+              <span class="sub-deck-lbl" style="margin:0;padding:0">GATE &amp; OD</span>
+              <button id="gateBtn" class="btn-toggle blue" style="padding:2px 6px" title="Enable Hard-Knee Noise Gate">GATE</button>
+              <div class="gate-meter-pill" title="Noise Gate Gain Reduction">
+                <div class="pill-bar" style="width:28px"><div class="pill-fill" id="gateBar" style="background:var(--ryo-blue)"></div></div>
+                <b id="gateMeter">0.0 dB</b>
+              </div>
+            </div>
+            <div style="display:flex;gap:3px;align-items:center">
+              <button id="boostBtn" class="btn-toggle amber" style="padding:2px 6px" title="Enable Overdrive Boost Pedal">OD</button>
+              <div id="boostTopoSeg" class="seg-group yellow-seg amp-seg-compact" title="Overdrive Diode Clipping Topology">
+                <button data-idx="0" class="on">SD-1</button>
+                <button data-idx="1">TS9</button>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;flex:1;min-height:0">
+            <div class="knob-row" id="gateKnobs" style="flex:2"></div>
+            <span class="amp-vsep" aria-hidden="true"></span>
+            <div class="knob-row" id="boostKnobs" style="flex:3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tube Preamp & Live PSU/Tube Telemetry -->
+    <div class="module-card" id="cardPreamp">
+      <div class="module-hdr">
+        <span class="module-title-wrap"><span class="module-name"><i class="module-dot"></i>TUBE PREAMP &amp; TONE STACK</span><span class="bypass-badge" id="bypassBadgePreamp" hidden>BYPASSED</span></span>
+        <div style="display:flex;gap:4px;align-items:center">
+          <div id="channelSeg" class="seg-group" title="Preamp Channel Voicing (US Clean vs High-Gain Lead)">
+            <button data-idx="0">US Clean</button>
+            <button data-idx="1" class="on">Lead</button>
+          </div>
+          <button id="preampBtn" class="btn-toggle" title="Enable Tube Preamp &amp; Tone Stack">PREAMP</button>
+        </div>
+      </div>
+      <div class="amp-deck-stack">
+        <div class="amp-sub-deck" style="flex:1.45">
+          <div class="sub-deck-lbl">Gain Stage · 3-Band Tone Stack · V1 Triode Physics</div>
+          <div class="knob-row" id="preampKnobs"></div>
+        </div>
+        <div class="amp-sub-deck" style="flex:1">
+          <div class="sub-deck-lbl">Live Tube &amp; PSU Telemetry</div>
+          <div class="amp-telem-grid">
+            <div class="amp-telem-pill">
+              <div class="telem-lbl">Plate B+</div>
+              <div class="telem-val" id="ampBPlusVal" style="color:var(--nijika-yellow)">460.0 V</div>
+            </div>
+            <div class="amp-telem-pill">
+              <div class="telem-lbl">PSU Sag</div>
+              <div class="telem-val" id="ampSagVal" style="color:var(--kita-red)">0.00 dB</div>
+            </div>
+            <div class="amp-telem-pill">
+              <div class="telem-lbl">V1 Anode</div>
+              <div class="telem-val" id="ampV1TempVal" style="color:var(--bocchi-pink)">115.0 &deg;C</div>
+            </div>
+            <div class="amp-telem-pill">
+              <div class="telem-lbl">Power Tubes</div>
+              <div class="telem-val" id="ampPwrTempVal" style="color:var(--ryo-blue)">165.0 &deg;C</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Amp Bottom Row: Power Amp & OT Iron | Studio FX Loop & Calibration -->
+  <div class="bottom-row" id="ampBottomRow" style="display:none">
+    <!-- Full Tube Power Amp & OT Iron -->
+    <div class="module-card" id="cardFullPower">
+      <div class="module-hdr">
+        <span class="module-title-wrap"><span class="module-name"><i class="module-dot red"></i>POWER AMP &amp; OT IRON</span><span class="bypass-badge" id="bypassBadgeFullPower" hidden>BYPASSED</span></span>
+        <div style="display:flex;gap:3px;align-items:center">
+          <div id="ampPowerTubeSeg" class="seg-group yellow-seg" title="Output Tube Topology (6L6 · Tight vs EL34 · Loose)">
+            <button data-idx="0" class="on">6L6 · Tight</button>
+            <button data-idx="1">EL34 · Loose</button>
+          </div>
+          <div id="rectifierSeg" class="seg-group" title="Power Supply Rectifier Sag Topology">
+            <button data-idx="0" class="on">Silicon</button>
+            <button data-idx="1">GZ34</button>
+            <button data-idx="2">5U4G</button>
+          </div>
+          <button id="powerAmpBtn" class="btn-toggle red" title="Enable Full Tube Power Amp &amp; Reactive Transformer">FULL AMP</button>
+        </div>
+      </div>
+      <div class="knob-row" id="powerKnobs"></div>
+    </div>
+
+    <!-- Studio FX Loop & Calibration -->
+    <div class="module-card" id="cardFxLoop">
+      <div class="module-hdr">
+        <span class="module-title-wrap"><span class="module-name"><i class="module-dot yellow"></i>STUDIO FX LOOP &amp; CAL</span><span class="bypass-badge" id="bypassBadgeFxLoop" hidden>BYPASSED</span></span>
+        <div style="display:flex;gap:4px;align-items:center">
+          <div id="fxLoopModeSeg" class="seg-group yellow-seg" title="Pre-Power-Amp Studio FX Loop Mode">
+            <button data-idx="0" class="on">Spring</button>
+            <button data-idx="1">BBD</button>
+            <button data-idx="2">Tape</button>
+          </div>
+          <button id="fxLoopBtn" class="btn-toggle amber" title="Enable Pre-Power-Amp Studio FX Loop">FX LOOP</button>
+        </div>
+      </div>
+      <div class="knob-row" id="fxLoopKnobs"></div>
+    </div>
+  </div>
+
+  <!-- Hidden Compatibility Relays (unused legacy placeholders only) -->
   <div style="display:none" aria-hidden="true">
     <span id="badgeArtic"></span>
     <span id="badgeImp"></span>
-    <div id="gateBar"></div>
-    <b id="gateMeter">0.0 dB</b>
-    <button id="loadBtn"></button>
-    <button id="gateBtn"></button>
-    <div id="reactiveSeg"><button></button><button></button></div>
-    <div id="loadKnobs"></div>
-    <button id="boostBtn"></button>
-    <div id="boostTopoSeg"><button></button><button></button></div>
-    <div id="boostKnobs"></div>
-    <button id="preampBtn"></button>
-    <div id="channelSeg"><button></button><button></button></div>
-    <div id="preampKnobs"></div>
-    <button id="powerAmpBtn"></button>
-    <div id="rectifierSeg"><button></button><button></button><button></button></div>
-    <div id="powerKnobs"></div>
     <button id="soloCabBtn"></button>
     <div id="roomKnobsTop"></div>
     <div id="roomKnobsBot"></div>
@@ -761,6 +1272,7 @@
     micProximityGainDb: 5.0, micOffAxisCutoffHz: 11500.0,
     impRatio: 1.0, dualCabActive: true,
     inPeakDb: -100.0, outPeakDb: -100.0, gateDepthDb: 0.0,
+    abSlotActive: 0,
     cabACustomIr: false, cabACustomIrName: '', cabACustomIrWave: [],
     cabBCustomIr: false, cabBCustomIrName: '', cabBCustomIrWave: []
   };
@@ -769,12 +1281,168 @@
   const comboState  = id => (Juce ? Juce.getComboBoxState(id) : null);
   const toggleState = id => (Juce ? Juce.getToggleState(id) : null);
 
+  const UI_PARAM_META = [
+    ['loadEnabled', 'toggle', false],
+    ['guitarVol', 'slider', 0.0, 10.0, 1.0, 10.0],
+    ['guitarTone', 'slider', 0.0, 10.0, 1.0, 10.0],
+    ['cableLenM', 'slider', 0.5, 12.0, 1.0, 3.0],
+    ['reactiveMode', 'combo', 1],
+    ['gateEnabled', 'toggle', false],
+    ['gateThresh', 'slider', -80.0, -18.0, 1.0, -52.0],
+    ['gateRelease', 'slider', 25.0, 350.0, 1.0, 65.0],
+    ['boostEnabled', 'toggle', false],
+    ['boostTopo', 'combo', 0],
+    ['boostDrive', 'slider', 0.0, 1.0, 1.0, 0.25],
+    ['boostTone', 'slider', 0.0, 1.0, 1.0, 0.55],
+    ['boostLevel', 'slider', 0.0, 1.0, 1.0, 0.75],
+    ['preampEnabled', 'toggle', false],
+    ['channel', 'combo', 1],
+    ['preampGain', 'slider', 0.0, 1.0, 1.0, 0.55],
+    ['bass', 'slider', 0.0, 1.0, 1.0, 0.50],
+    ['mid', 'slider', 0.0, 1.0, 1.0, 0.50],
+    ['treble', 'slider', 0.0, 1.0, 1.0, 0.55],
+    ['preampBias', 'slider', -1.5, 1.0, 1.0, 0.0],
+    ['preampAge', 'slider', 0.0, 1.0, 1.0, 0.15],
+    ['powerAmpEnabled', 'toggle', false],
+    ['powerTube', 'combo', 0],
+    ['rectifier', 'combo', 0],
+    ['masterVol', 'slider', 0.0, 1.0, 1.0, 0.55],
+    ['presence', 'slider', 0.0, 1.0, 1.0, 0.50],
+    ['depth', 'slider', 0.0, 1.0, 1.0, 0.50],
+    ['nfbAmount', 'slider', 0.0, 1.0, 1.0, 0.55],
+    ['powerBias', 'slider', -56.0, -30.0, 1.0, -43.0],
+    ['powerAge', 'slider', 0.0, 1.0, 1.0, 0.18],
+    ['xfmrDrive', 'slider', 0.0, 1.0, 1.0, 0.50],
+    ['powerScaleW', 'slider', 5.0, 120.0, 1.0, 50.0],
+    ['impRatio', 'slider', 0.50, 2.00, 1.0, 1.00],
+    ['cabEnabled', 'toggle', true],
+    ['cabModel', 'combo', 2],
+    ['cabBoxScale', 'slider', 0.85, 1.15, 1.0, 1.00],
+    ['cabConeDamp', 'slider', 0.70, 1.40, 1.0, 1.00],
+    ['cabALoResDb', 'slider', -6.0, 6.0, 1.0, 0.0],
+    ['cabAHiResDb', 'slider', -6.0, 6.0, 1.0, 0.0],
+    ['cabAHpfHz', 'slider', 20.0, 400.0, 0.42, 20.0],
+    ['cabALpfHz', 'slider', 2000.0, 20000.0, 0.42, 20000.0],
+    ['cabAPan', 'slider', -1.0, 1.0, 1.0, -0.25],
+    ['cabALevelDb', 'slider', -24.0, 12.0, 1.0, 0.0],
+    ['micEnabled', 'toggle', true],
+    ['micModel', 'combo', 0],
+    ['micDistCm', 'slider', 0.5, 50.0, 0.50, 2.5],
+    ['micOffAxis', 'slider', 0.0, 45.0, 1.0, 12.0],
+    ['micConePos', 'slider', 0.0, 1.0, 1.0, 0.35],
+    ['micDrive', 'slider', -12.0, 24.0, 1.0, 0.0],
+    ['micPreDrive', 'slider', -12.0, 24.0, 1.0, 0.0],
+    ['micPhase', 'toggle', false],
+    ['micPreModel', 'combo', 1],
+    ['cabBEnabled', 'toggle', true],
+    ['cabBModel', 'combo', 1],
+    ['cabBBoxScale', 'slider', 0.85, 1.15, 1.0, 1.00],
+    ['cabBConeDamp', 'slider', 0.70, 1.40, 1.0, 1.00],
+    ['cabBLoResDb', 'slider', -6.0, 6.0, 1.0, 0.0],
+    ['cabBHiResDb', 'slider', -6.0, 6.0, 1.0, 0.0],
+    ['cabBHpfHz', 'slider', 20.0, 400.0, 0.42, 20.0],
+    ['cabBLpfHz', 'slider', 2000.0, 20000.0, 0.42, 20000.0],
+    ['cabBPan', 'slider', -1.0, 1.0, 1.0, 0.25],
+    ['cabBLevelDb', 'slider', -24.0, 12.0, 1.0, 0.0],
+    ['micBEnabled', 'toggle', true],
+    ['micBModel', 'combo', 1],
+    ['micBDistCm', 'slider', 0.5, 50.0, 0.50, 2.5],
+    ['micBOffAxis', 'slider', 0.0, 45.0, 1.0, 10.0],
+    ['micBConePos', 'slider', 0.0, 1.0, 1.0, 0.40],
+    ['micBDrive', 'slider', -12.0, 24.0, 1.0, 0.0],
+    ['micBPreDrive', 'slider', -12.0, 24.0, 1.0, 0.0],
+    ['micBPhase', 'toggle', false],
+    ['micBPreModel', 'combo', 2],
+    ['roomEnabled', 'toggle', true],
+    ['roomType', 'combo', 1],
+    ['roomPanMode', 'combo', 0],
+    ['roomSize', 'slider', 0.60, 1.50, 1.0, 1.00],
+    ['roomDistM', 'slider', 0.40, 6.00, 1.0, 2.20],
+    ['roomDamp', 'slider', 0.0, 1.0, 1.0, 0.45],
+    ['roomWidth', 'slider', 0.0, 1.0, 1.0, 0.80],
+    ['roomLevel', 'slider', 0.0, 1.0, 1.0, 0.28],
+    ['inputCal', 'slider', -18.0, 18.0, 1.0, 0.0],
+    ['outputDb', 'slider', -36.0, 18.0, 1.0, 0.0],
+    ['power', 'toggle', true],
+    ['roomSmash', 'slider', 0.0, 1.0, 1.0, 0.0],
+    ['cabBDelayMs', 'slider', 0.0, 10.0, 0.55, 0.0],
+    ['roomPreDelayMs', 'slider', 0.0, 100.0, 0.65, 0.0],
+    ['roomLoCutHz', 'slider', 20.0, 600.0, 0.42, 20.0],
+    ['roomHiCutHz', 'slider', 1500.0, 20000.0, 0.42, 20000.0],
+    ['fxLoopEnabled', 'toggle', false],
+    ['fxLoopMode', 'combo', 0],
+    ['fxLoopTime', 'slider', 0.0, 1.0, 1.0, 0.45],
+    ['fxLoopFeedback', 'slider', 0.0, 1.0, 1.0, 0.35],
+    ['fxLoopMix', 'slider', 0.0, 1.0, 1.0, 0.22],
+    ['loadPickupModel', 'combo', 0],
+    ['loadWiring', 'combo', 0],
+    ['loadBleedType', 'combo', 0],
+    ['loadCablePreset', 'combo', 0],
+    ['loadDielectricLoss', 'slider', 0.0, 1.0, 1.0, 0.0],
+    ['loadCouplingProfile', 'combo', 0],
+    ['cabACutOrder', 'combo', 0],
+    ['cabBCutOrder', 'combo', 0]
+  ];
+  const SLIDER_SPEC_BY_ID = new Map();
+  for (const entry of UI_PARAM_META) {
+    if (entry[1] === 'slider') {
+      SLIDER_SPEC_BY_ID.set(entry[0], { start: entry[2], end: entry[3], skew: entry[4], defVal: entry[5] });
+    }
+  }
+  function resolveSliderRange (st, fallbackStart, fallbackEnd, fallbackSkew) {
+    const props = st && st.properties;
+    const paramIdx = props ? props.parameterIndex : undefined;
+    if (props && paramIdx !== -1) {
+      const start = Number(props.start);
+      const end   = Number(props.end);
+      const skew  = Number(props.skew);
+      if (Number.isFinite(start) && Number.isFinite(end) && end > start) {
+        return {
+          start,
+          end,
+          skew: (Number.isFinite(skew) && skew > 0)
+            ? skew
+            : ((Number.isFinite(fallbackSkew) && fallbackSkew > 0) ? fallbackSkew : 1.0)
+        };
+      }
+    }
+    return {
+      start: fallbackStart,
+      end:   fallbackEnd,
+      skew:  (Number.isFinite(fallbackSkew) && fallbackSkew > 0) ? fallbackSkew : 1.0
+    };
+  }
+
+  let currentStageScale = 1.0;
+  let bringToFrontNative = null;
+  let presetSyncInFlight = 0;
+  let lastSyncedTelemetryPreset = null;
+  const markRigPresetDirty = () => {
+    if (window.__wdUiBootPending) return;
+    lastSyncedTelemetryPreset = -1;
+    const sel = $('rigPresetSel');
+    if (sel && sel.value !== '') sel.value = '';
+  };
+  const middleEllipsis = (name, maxLen) => {
+    const s = String(name || '');
+    if (s.length <= maxLen || maxLen < 7) return s;
+    const keepRight = Math.max(4, Math.min(10, Math.floor((maxLen - 3) * 0.45)));
+    const keepLeft = Math.max(2, maxLen - 3 - keepRight);
+    return s.slice(0, keepLeft) + '...' + s.slice(s.length - keepRight);
+  };
   function fitStage () {
+    if (window.__WD_WEB_HOST__) return;
     const st = $('stage');
     const vw = document.documentElement.clientWidth  || window.innerWidth  || 1180;
     const vh = document.documentElement.clientHeight || window.innerHeight || 760;
+    if (vw < 1180 || vh < 760) {
+      currentStageScale = 1.0;
+      if (st && st.style) st.style.transform = 'none';
+      return;
+    }
     const scale = Math.min(vw / 1180, vh / 760);
-    st.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(4) + ')';
+    currentStageScale = (Number.isFinite(scale) && scale > 0) ? scale : 1.0;
+    if (st && st.style) st.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(4) + ')';
   }
   window.addEventListener('resize', fitStage);
   if (typeof ResizeObserver !== 'undefined') {
@@ -783,20 +1451,30 @@
   fitStage();
 
   document.addEventListener('pointerdown', () => {
-    if (bus && window.__JUCE__.backend) {
-      try {
-        if (Juce && typeof Juce.getNativeFunction === 'function') {
-          Juce.getNativeFunction('bringToFront')();
-        }
-      } catch (_) {}
+    if (typeof bringToFrontNative === 'function') {
+      try { bringToFrontNative(); } catch (_) {}
     }
   }, true);
+
+  const KNOB_SECTION_PREFIX = {
+    cabAKnobsTop: 'Cab A ', cabAKnobsBot: 'Cab A ',
+    cabBKnobsTop: 'Cab B ', cabBKnobsBot: 'Cab B ',
+    motorKnobs: 'Motor ', roomKnobsAll: 'Room ',
+    loadKnobs: 'WD Load ', gateKnobs: 'Gate ', boostKnobs: 'Overdrive ',
+    preampKnobs: 'Preamp ', powerKnobs: 'Power Amp ', fxLoopKnobs: 'FX Loop '
+  };
 
   // Kessoku Rotary Arc Knob (Inherits the exact look from wd_cab_physical_acoustic_simulator_ui.html)
   function makeKnob (mount, def) {
     const wrap = document.createElement('div');
     wrap.className = 'knob';
     wrap.dataset.param = def.param;
+    wrap.tabIndex = 0;
+    const ariaName = (KNOB_SECTION_PREFIX[mount] || '') + def.label;
+    if (typeof wrap.setAttribute === 'function') {
+      wrap.setAttribute('role', 'slider');
+      wrap.setAttribute('aria-label', ariaName);
+    }
     if (def.tip) wrap.title = def.tip;
     const size = def.size || 38;
     const lab = document.createElement('div'); lab.className = 'kl'; lab.textContent = def.label;
@@ -814,7 +1492,13 @@
     $(mount).appendChild(wrap);
 
     const st = sliderState(def.param);
-    let norm = def.def !== undefined ? def.def : 0.5;
+    const metaSpec = SLIDER_SPEC_BY_ID.get(def.param);
+    const fbStart = (def.min !== undefined) ? def.min : (metaSpec ? metaSpec.start : 0);
+    const fbEnd   = (def.max !== undefined) ? def.max : (metaSpec ? metaSpec.end   : 1);
+    const fbSkew  = (def.skew !== undefined) ? def.skew : (metaSpec ? metaSpec.skew : 1.0);
+    let range = resolveSliderRange(st, fbStart, fbEnd, fbSkew);
+    const defaultNorm = def.def !== undefined ? def.def : 0.5;
+    let norm = defaultNorm;
 
     const draw = () => {
       const g = cv.getContext('2d');
@@ -862,15 +1546,102 @@
       g.stroke();
     };
 
+    const scaledFromNorm = n => {
+      const clamped = Math.max(0, Math.min(1, n));
+      const inv = (range.skew && range.skew !== 1.0 && clamped > 0.0)
+        ? Math.pow(clamped, 1.0 / range.skew)
+        : clamped;
+      return range.start + (range.end - range.start) * inv;
+    };
+
+    const normFromScaled = v => {
+      const span = Math.max(1e-9, range.end - range.start);
+      const lin = Math.max(0, Math.min(1, (v - range.start) / span));
+      return (range.skew && range.skew !== 1.0 && lin > 0.0) ? Math.pow(lin, range.skew) : lin;
+    };
+
+    let editingInline = false;
     const show = () => {
-      const v = st ? st.getScaledValue() : (def.min + (def.max - def.min) * norm);
-      val.textContent = def.fmt ? def.fmt(v) : v.toFixed(2);
+      const v = st ? st.getScaledValue() : scaledFromNorm(norm);
+      const txt = def.fmt ? def.fmt(v) : v.toFixed(2);
+      if (!editingInline) val.textContent = txt;
+      if (typeof wrap.setAttribute === 'function') {
+        wrap.setAttribute('aria-valuemin', String(range.start));
+        wrap.setAttribute('aria-valuemax', String(range.end));
+        wrap.setAttribute('aria-valuenow', Number.isFinite(v) ? v.toFixed(3) : '0');
+        wrap.setAttribute('aria-valuetext', txt);
+      }
     };
 
     const refresh = () => {
+      if (dragging) return;
       if (st) norm = st.getNormalisedValue();
       draw(); show();
       if (def.onChange) def.onChange();
+    };
+
+    const commitNorm = nextNorm => {
+      norm = Math.max(0, Math.min(1, nextNorm));
+      if (st) {
+        if (typeof st.sliderDragStarted === 'function') st.sliderDragStarted();
+        st.setNormalisedValue(norm);
+        if (typeof st.sliderDragEnded === 'function') st.sliderDragEnded();
+      }
+      draw(); show();
+      if (def.onChange) def.onChange();
+      markRigPresetDirty();
+    };
+
+    const openInlineEdit = () => {
+      if (editingInline || typeof document.createElement !== 'function') return;
+      editingInline = true;
+      const curScaled = st ? st.getScaledValue() : scaledFromNorm(norm);
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.className = 'kv-input';
+      inp.value = Number.isFinite(curScaled) ? String(Number(curScaled.toFixed(2))) : '';
+      if (typeof inp.setAttribute === 'function') inp.setAttribute('aria-label', ariaName + ' value');
+      val.textContent = '';
+      val.appendChild(inp);
+      if (typeof inp.focus === 'function') inp.focus();
+      if (typeof inp.select === 'function') inp.select();
+
+      let closed = false;
+      const finish = (commit, restoreFocus = false) => {
+        if (closed) return;
+        closed = true;
+        editingInline = false;
+        if (commit) {
+          const rawStr = String(inp.value || '').trim().toLowerCase();
+          const numMatch = rawStr.match(/^([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*(khz|k|hz|ms|db|cm|m|v|w|x|%)?$/);
+          if (numMatch) {
+            let parsed = parseFloat(numMatch[1]);
+            const unit = numMatch[2] || '';
+            if ((unit === 'k' || unit === 'khz') && range.end >= 1000) parsed *= 1000;
+            if (unit === '%' && range.end <= 1.5 && range.start >= 0) parsed /= 100;
+            if (Number.isFinite(parsed)) {
+              commitNorm(normFromScaled(Math.max(range.start, Math.min(range.end, parsed))));
+            }
+          }
+        }
+        show();
+        if (restoreFocus && typeof wrap.focus === 'function') {
+          try { wrap.focus(); } catch (_) {}
+        }
+      };
+      inp.addEventListener('pointerdown', e => { if (e && typeof e.stopPropagation === 'function') e.stopPropagation(); });
+      inp.addEventListener('keydown', e => {
+        if (!e) return;
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        if (e.key === 'Enter') {
+          if (typeof e.preventDefault === 'function') e.preventDefault();
+          finish(true, true);
+        } else if (e.key === 'Escape') {
+          if (typeof e.preventDefault === 'function') e.preventDefault();
+          finish(false, true);
+        }
+      });
+      inp.addEventListener('blur', () => finish(true, false));
     };
 
     let dragging = false, activePointerId = null, lastY = 0;
@@ -879,6 +1650,7 @@
       const pid = activePointerId;
       dragging = false;
       activePointerId = null;
+      if (wrap.classList) wrap.classList.remove('dragging');
       try {
         if (pid !== null && typeof wrap.releasePointerCapture === 'function') {
           if (typeof wrap.hasPointerCapture !== 'function' || wrap.hasPointerCapture(pid)) {
@@ -887,42 +1659,55 @@
         }
       } catch (_) {}
       if (st && typeof st.sliderDragEnded === 'function') st.sliderDragEnded();
+      refresh();
     };
     const onPointerEnd = e => {
       if (!dragging || e.pointerId !== activePointerId) return;
       endDrag();
     };
+    const isFromVal = e => !!(e && e.target && (e.target === val || (typeof val.contains === 'function' && val.contains(e.target))));
     wrap.addEventListener('pointerdown', e => {
+      if (editingInline || isFromVal(e)) return;
       if ((typeof e.button === 'number' && e.button !== 0) || dragging || activePointerId !== null) return;
       dragging = true; activePointerId = e.pointerId; lastY = e.clientY;
+      if (wrap.classList) wrap.classList.add('dragging');
+      if (typeof wrap.focus === 'function') { try { wrap.focus(); } catch (_) {} }
       try { if (typeof wrap.setPointerCapture === 'function') wrap.setPointerCapture(e.pointerId); } catch (_) {}
       if (st && typeof st.sliderDragStarted === 'function') st.sliderDragStarted();
     });
     wrap.addEventListener('pointermove', e => {
       if (!dragging || e.pointerId !== activePointerId) return;
-      const dy = lastY - e.clientY; lastY = e.clientY;
+      const extScale = (typeof window !== 'undefined' && typeof window.__wdStageScale === 'number' &&
+                        Number.isFinite(window.__wdStageScale) && window.__wdStageScale > 0)
+        ? window.__wdStageScale
+        : currentStageScale;
+      const invScale = 1.0 / ((Number.isFinite(extScale) && extScale > 0) ? extScale : 1.0);
+      const dy = (lastY - e.clientY) * invScale; lastY = e.clientY;
       norm = Math.max(0, Math.min(1, norm + dy * (e.shiftKey ? 0.0012 : 0.005)));
       if (st) st.setNormalisedValue(norm);
       draw(); show();
       if (def.onChange) def.onChange();
+      markRigPresetDirty();
     });
     wrap.addEventListener('pointerup', onPointerEnd);
     wrap.addEventListener('pointercancel', onPointerEnd);
     wrap.addEventListener('lostpointercapture', onPointerEnd);
     window.addEventListener('blur', endDrag);
-    wrap.addEventListener('dblclick', () => {
+    val.addEventListener('dblclick', e => {
+      if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+      if (e && typeof e.preventDefault === 'function') e.preventDefault();
       endDrag();
-      norm = def.def !== undefined ? def.def : 0.5;
-      if (st) {
-        if (typeof st.sliderDragStarted === 'function') st.sliderDragStarted();
-        st.setNormalisedValue(norm);
-        if (typeof st.sliderDragEnded === 'function') st.sliderDragEnded();
-      }
-      draw(); show();
-      if (def.onChange) def.onChange();
+      openInlineEdit();
+    });
+    wrap.addEventListener('dblclick', e => {
+      if (isFromVal(e)) return;
+      if (typeof wrap.getAttribute === 'function' && wrap.getAttribute('aria-disabled') === 'true') return;
+      endDrag();
+      commitNorm(defaultNorm);
     });
     wrap.addEventListener('wheel', e => {
       e.preventDefault();
+      if (typeof wrap.getAttribute === 'function' && wrap.getAttribute('aria-disabled') === 'true') return;
       norm = Math.max(0, Math.min(1, norm + (e.deltaY < 0 ? 1 : -1) * 0.02));
       if (st) {
         if (dragging) {
@@ -935,9 +1720,49 @@
       }
       draw(); show();
       if (def.onChange) def.onChange();
+      markRigPresetDirty();
     }, { passive: false });
+    wrap.addEventListener('keydown', e => {
+      if (!e || editingInline) return;
+      if (typeof wrap.getAttribute === 'function' && wrap.getAttribute('aria-disabled') === 'true') return;
+      const k = e.key;
+      const step = e.shiftKey ? 0.005 : 0.02;
+      if (k === 'ArrowUp' || k === 'ArrowRight') {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        commitNorm(norm + step);
+      } else if (k === 'ArrowDown' || k === 'ArrowLeft') {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        commitNorm(norm - step);
+      } else if (k === 'PageUp') {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        commitNorm(norm + 0.10);
+      } else if (k === 'PageDown') {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        commitNorm(norm - 0.10);
+      } else if (k === 'Home') {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        commitNorm(0);
+      } else if (k === 'End') {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        commitNorm(1);
+      } else if (k === 'Delete' || k === 'Backspace') {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        commitNorm(defaultNorm);
+      } else if (k === 'Enter' || k === 'F2') {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        openInlineEdit();
+      }
+    });
 
-    if (st) st.valueChangedEvent.addListener(refresh);
+    if (st) {
+      st.valueChangedEvent.addListener(refresh);
+      if (st.propertiesChangedEvent && typeof st.propertiesChangedEvent.addListener === 'function') {
+        st.propertiesChangedEvent.addListener(() => {
+          range = resolveSliderRange(st, fbStart, fbEnd, fbSkew);
+          refresh();
+        });
+      }
+    }
     refresh();
     return { refresh };
   }
@@ -947,6 +1772,14 @@
   // with mic movement restricted to the right half (0% Cap -> 35% Seam -> 100% Edge).
   function makeMicStage (canvasId, cfg) {
     const cv = $(canvasId);
+    const stagePrefix = (canvasId === 'micStageA') ? 'Cab A' : 'Cab B';
+    cv.tabIndex = 0;
+    if (typeof cv.setAttribute === 'function') {
+      cv.setAttribute('role', 'slider');
+      cv.setAttribute('aria-label', stagePrefix + ' 2D Mic Placement (Arrows: Cone X / Distance Y, [ ]: Angle, Shift: Fine, Delete: Reset)');
+      cv.setAttribute('aria-valuemin', '0');
+      cv.setAttribute('aria-valuemax', '100');
+    }
     const stCone  = sliderState(cfg.coneParam);
     const stDist  = sliderState(cfg.distParam);
     const stAngle = sliderState(cfg.angleParam);
@@ -998,9 +1831,20 @@
         : Math.round((stCabM.value || 0) * 12);
     };
 
+    const distRange  = () => resolveSliderRange(stDist,  0.5,   50.0, 0.50);
+    const angleRange = () => resolveSliderRange(stAngle, 0.0,   45.0, 1.0);
+    const driveRange = () => resolveSliderRange(stDrive, -12.0, 24.0, 1.0);
+    const scaledFromRange = (r, n) => {
+      const clamped = Math.max(0, Math.min(1, n));
+      const inv = (r.skew && r.skew !== 1.0 && clamped > 0.0)
+        ? Math.pow(clamped, 1.0 / r.skew)
+        : clamped;
+      return r.start + (r.end - r.start) * inv;
+    };
+
     const getDistCm = () => {
       if (!dragging && stDist) return stDist.getScaledValue();
-      return 0.5 + Math.pow(Math.max(0, Math.min(1, normDist)), 2.0) * 49.5;
+      return scaledFromRange(distRange(), normDist);
     };
     const getConePct = () => {
       if (!dragging && stCone) return Math.round(stCone.getScaledValue() * 100);
@@ -1008,11 +1852,11 @@
     };
     const getAngleDeg = () => {
       if (stAngle) return Math.round(stAngle.getScaledValue());
-      return Math.round(normAngle * 45);
+      return Math.round(scaledFromRange(angleRange(), normAngle));
     };
     const getDriveDb = () => {
       if (stDrive) return stDrive.getScaledValue();
-      return -12.0 + Math.max(0, Math.min(1, normDrive)) * 36.0;
+      return scaledFromRange(driveRange(), normDrive);
     };
     const getEffectiveSplDb = () => {
       const distM      = Math.max(0.005, Math.min(0.50, getDistCm() * 0.01));
@@ -1038,12 +1882,12 @@
 
     const layout = (w, h) => {
       const cx      = Math.round(w * 0.50);
-      const maxR    = Math.max(40, w * 0.45);
+      const maxR    = Math.min(Math.max(40, w * 0.45), Math.max(95, h * 0.85));
       const grilleY = 54;
       const minX    = cx;          // 0% Center of Dust Cap
       const maxX    = cx + maxR;   // 100% Right Cone Edge (mic restricted to right half)
       const spanX   = maxR;
-      const minY    = grilleY + 6;
+      const minY    = grilleY + 14;
       const maxY    = h - 38;
       return { cx, maxR, minX, maxX, spanX, grilleY, minY, maxY };
     };
@@ -1051,8 +1895,8 @@
     const draw = () => {
       const dpr = Math.max(1, window.devicePixelRatio || 1);
       const wrapEl = cv.parentElement;
-      const w = (wrapEl && wrapEl.clientWidth)  || 206;
-      const h = (wrapEl && wrapEl.clientHeight) || 240;
+      const w = (wrapEl && wrapEl.clientWidth)  || 186;
+      const h = (wrapEl && wrapEl.clientHeight) || 216;
       const pw = Math.round(w * dpr), ph = Math.round(h * dpr);
       if (cv.width !== pw || cv.height !== ph) {
         cv.width = pw; cv.height = ph;
@@ -1065,7 +1909,18 @@
       const capR = 0.35 * maxR;
       const rimR = 0.88 * maxR;
 
-      // 1. Clean uniform recessed studio background (no shading overlay)
+      const conePctAria = getConePct();
+      const zoneLblAria = conePctAria < 15 ? 'CAP' : (conePctAria < 48 ? 'SEAM' : 'EDGE');
+      if (typeof cv.setAttribute === 'function') {
+        if (customIrActive) {
+          cv.setAttribute('aria-valuenow', '0');
+          cv.setAttribute('aria-valuetext', 'User IR active: ' + (customIrName || 'Loaded User IR'));
+        } else {
+          cv.setAttribute('aria-valuenow', String(conePctAria));
+          cv.setAttribute('aria-valuetext', zoneLblAria + ' ' + conePctAria + '%, Distance ' + getDistCm().toFixed(1) + ' cm, Angle ' + getAngleDeg() + '°');
+        }
+      }
+
       if (customIrActive) {
         g.fillStyle = '#121316';
         g.fillRect(0, 0, w, h);
@@ -1084,16 +1939,16 @@
           g.beginPath(); g.moveTo(0, gy); g.lineTo(w, gy); g.stroke();
         }
 
-        g.font = '700 8px Barlow, sans-serif';
+        g.font = '700 10px Barlow, sans-serif';
         g.textAlign = 'center';
-        g.fillStyle = '#8e94a0';
-        g.fillText('USER .WAV IR · MOTOR + PREAMP', w * 0.5, 14);
+        g.fillStyle = '#949aa6';
+        g.fillText('USER .WAV IR · MOTOR + PRE', w * 0.5, 14);
 
         const rawName = (customIrName || 'Loaded User IR');
-        const dispName = rawName.length > 26 ? (rawName.slice(0, 23) + '...') : rawName;
-        g.font = '600 9px "JetBrains Mono", monospace';
+        const dispName = middleEllipsis(rawName, 24);
+        g.font = '600 10px "JetBrains Mono", "Cascadia Mono", Consolas, Barlow, monospace';
         g.fillStyle = accent;
-        g.fillText(dispName, w * 0.5, 28);
+        g.fillText(dispName, w * 0.5, 29);
 
         if (Array.isArray(customIrWave) && customIrWave.length > 1) {
           const nw = customIrWave.length;
@@ -1128,17 +1983,17 @@
 
         g.fillStyle = '#0e1013';
         g.fillRect(0, h - 20, w, 20);
-        g.strokeStyle = '#252830';
+        g.strokeStyle = '#686f7e';
         g.beginPath(); g.moveTo(0, h - 20.5); g.lineTo(w, h - 20.5); g.stroke();
 
         const preNames = ['CLN', '73', '12', '76', 'REDD', 'PRTA'];
         const preLbl   = preNames[Math.max(0, Math.min(5, getPreIdx()))] || '73';
         const phaseInv = stPhase ? !!stPhase.getValue() : curPhase;
-        const shortTag = rawName.length > 14 ? (rawName.slice(0, 12) + '..') : rawName;
+        const shortTag = middleEllipsis(rawName, 16);
         g.fillStyle = '#eceef2';
-        g.font = '600 8.5px "JetBrains Mono", monospace';
+        g.font = '600 10px "JetBrains Mono", "Cascadia Mono", Consolas, Barlow, monospace';
         g.textAlign = 'center';
-        g.fillText('IR · ' + shortTag + ' · ' + preLbl + (phaseInv ? ' · Ø' : ''), w * 0.5, h - 6);
+        g.fillText('IR ' + shortTag + ' ' + preLbl + (phaseInv ? ' Ø' : ''), w * 0.5, h - 6);
         g.textAlign = 'left';
         return;
       }
@@ -1146,14 +2001,18 @@
       g.fillStyle = '#121316';
       g.fillRect(0, 0, w, h);
 
+      // Shade inactive left half so right-half active placement zone is unmistakable
+      g.fillStyle = 'rgba(6, 7, 10, 0.55)';
+      g.fillRect(0, grilleY, cx, Math.max(0, h - 20 - grilleY));
+
       // Distance horizontal scale lines (skew = 0.50)
-      g.font = '600 8px "JetBrains Mono", monospace';
+      g.font = '600 10px "JetBrains Mono", "Cascadia Mono", Consolas, Barlow, monospace';
       g.lineWidth = 1;
       for (const [nY, lbl] of [[0.0, '0.5cm'], [0.225, '3cm'], [0.482, '12cm'], [1.0, '50cm']]) {
         const y = Math.round(minY + nY * (maxY - minY)) + 0.5;
-        g.strokeStyle = nY === 0 ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)';
+        g.strokeStyle = nY === 0 ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)';
         g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke();
-        g.fillStyle = '#585e6b';
+        g.fillStyle = '#949aa6';
         g.textAlign = 'left';
         g.fillText(lbl, 5, y - 3);
       }
@@ -1163,10 +2022,19 @@
         g.save();
         const x = Math.round(xVal) + 0.5;
         if (dashed) g.setLineDash([2, 3]);
-        g.strokeStyle = xVal === cx ? 'rgba(255,255,255,0.09)' : (xVal === cx + capR ? accentAlpha : 'rgba(255,255,255,0.04)');
+        g.strokeStyle = xVal === cx ? '#686f7e' : (xVal === cx + capR ? accentAlpha : 'rgba(255,255,255,0.06)');
         g.beginPath(); g.moveTo(x, grilleY); g.lineTo(x, h - 20); g.stroke();
         g.restore();
       }
+
+      // Inactive left-half affordance + idle User IR drop cue (positioned between 12cm and 50cm lines)
+      const cueMidY = Math.round(minY + 0.72 * (maxY - minY));
+      g.font = '700 10px Barlow, sans-serif';
+      g.textAlign = 'center';
+      g.fillStyle = '#949aa6';
+      g.fillText('ACTIVE →', cx * 0.5, cueMidY - 6);
+      g.fillText('DROP .WAV', cx * 0.5, cueMidY + 8);
+      g.textAlign = 'left';
 
       // 2. Clean Unshaded Full Left-to-Right Speaker Line Drawing at Top
       const cabIdx   = getCabIdx();
@@ -1224,7 +2092,7 @@
       g.beginPath(); g.arc(cx + capR, coneTopY, 2.1, 0, Math.PI * 2); g.fill();
 
       // Clean Acoustic Grille Line across full width at Y = grilleY
-      g.strokeStyle = '#363b47';
+      g.strokeStyle = '#686f7e';
       g.lineWidth = 1.5;
       g.beginPath();
       g.moveTo(0, grilleY - 0.5);
@@ -1232,15 +2100,16 @@
       g.stroke();
 
       // Zone labels above active right half (0% Center -> 35% Seam -> 100% Edge)
-      g.font = '700 8px Barlow, sans-serif';
-      g.textAlign = 'center';
-      g.fillStyle = '#b6bcc8';
-      g.fillText('0% CAP', cx, 10);
-      g.fillStyle = accent;
-      g.fillText('SEAM', cx + capR, 10);
+      g.font = '700 10px Barlow, sans-serif';
       g.textAlign = 'right';
-      g.fillStyle = '#8e94a0';
-      g.fillText('EDGE', w - 4, 10);
+      g.fillStyle = '#b6bcc8';
+      g.fillText('0% CAP', cx - 2, 11);
+      g.textAlign = 'center';
+      g.fillStyle = accent;
+      g.fillText('SEAM', cx + capR + 4, 11);
+      g.textAlign = 'right';
+      g.fillStyle = '#949aa6';
+      g.fillText('EDGE', w - 4, 11);
 
       // 3. Compute Current Mic Position (mx, my) & Tilt Angle
       const mx = minX + normCone * spanX;
@@ -1435,7 +2304,7 @@
       // 6. Clean Bottom Readout Strip
       g.fillStyle = '#0e1013';
       g.fillRect(0, h - 20, w, 20);
-      g.strokeStyle = '#252830';
+      g.strokeStyle = '#686f7e';
       g.beginPath(); g.moveTo(0, h - 20.5); g.lineTo(w, h - 20.5); g.stroke();
 
       const conePct  = getConePct();
@@ -1446,10 +2315,10 @@
       const preLbl   = preNames[Math.max(0, Math.min(5, getPreIdx()))] || '73';
       const phaseInv = stPhase ? !!stPhase.getValue() : curPhase;
       g.fillStyle = '#eceef2';
-      g.font = '600 8.5px "JetBrains Mono", monospace';
+      g.font = '600 10px Barlow, sans-serif';
       g.textAlign = 'center';
       g.fillText(
-        zoneLbl + ' ' + conePct + '% · ' + distCm.toFixed(1) + 'cm · ' + splDb + 'dB · ' + preLbl + (phaseInv ? ' · Ø' : ''),
+        zoneLbl + ' ' + conePct + '% · ' + distCm.toFixed(1) + ' cm · ' + splDb + ' dB · ' + preLbl + (phaseInv ? ' · Ø' : ''),
         w * 0.5, h - 6
       );
       g.textAlign = 'left';
@@ -1458,8 +2327,8 @@
     const pointerCoords = e => {
       const rect = cv.getBoundingClientRect();
       const wrapEl = cv.parentElement;
-      const w = (wrapEl && wrapEl.clientWidth)  || 206;
-      const h = (wrapEl && wrapEl.clientHeight) || 240;
+      const w = (wrapEl && wrapEl.clientWidth)  || 186;
+      const h = (wrapEl && wrapEl.clientHeight) || 216;
       const px = (e.clientX - rect.left) * (w / Math.max(1, rect.width));
       const py = (e.clientY - rect.top)  * (h / Math.max(1, rect.height));
       return { px, py, w, h };
@@ -1476,6 +2345,7 @@
 
       if (stCone) stCone.setNormalisedValue(normCone);
       if (stDist) stDist.setNormalisedValue(normDist);
+      markRigPresetDirty();
       draw();
     };
 
@@ -1506,6 +2376,7 @@
     cv.addEventListener('pointerdown', e => {
       if (customIrActive) return;
       if ((typeof e.button === 'number' && e.button !== 0) || dragging || activePointerId !== null) return;
+      if (typeof cv.focus === 'function') { try { cv.focus(); } catch (_) {} }
       dragging = true;
       activePointerId = e.pointerId;
       try { if (typeof cv.setPointerCapture === 'function') cv.setPointerCapture(e.pointerId); } catch (_) {}
@@ -1546,13 +2417,11 @@
         stAngle.setNormalisedValue(normAngle);
         if (typeof stAngle.sliderDragEnded === 'function') stAngle.sliderDragEnded();
       }
+      markRigPresetDirty();
       draw();
     }, { passive: false });
 
-    // Double-click resets to studio sweet spot (35% Seam, 2.5 cm, 12 deg)
-    cv.addEventListener('dblclick', () => {
-      if (customIrActive) return;
-      endDrag();
+    const commitMicReset = () => {
       const targetCone  = cfg.defCone  !== undefined ? cfg.defCone  : 0.35;
       const targetDist  = cfg.defDist  !== undefined ? cfg.defDist  : Math.sqrt(2 / 49.5);
       const targetAngle = cfg.defAngle !== undefined ? cfg.defAngle : (12 / 45);
@@ -1577,13 +2446,83 @@
       normCone  = targetCone;
       normDist  = targetDist;
       normAngle = targetAngle;
+      markRigPresetDirty();
+      draw();
+    };
+
+    // Double-click resets to studio sweet spot (35% Seam, 2.5 cm, 12 deg)
+    cv.addEventListener('dblclick', () => {
+      if (customIrActive) return;
+      endDrag();
+      commitMicReset();
+    });
+
+    // Keyboard operability for 2D Mic Stage (Arrows: Cone X / Distance Y, [ ]: Angle, Shift: Fine, Delete: Reset)
+    cv.addEventListener('keydown', e => {
+      if (!e || customIrActive) return;
+      const k = e.key;
+      const step = e.shiftKey ? 0.005 : 0.02;
+      let changedCone = false, changedDist = false, changedAngle = false;
+      let targetCone = normCone, targetDist = normDist, targetAngle = normAngle;
+      if (k === 'ArrowRight') { targetCone = Math.min(1, normCone + step); changedCone = true; }
+      else if (k === 'ArrowLeft') { targetCone = Math.max(0, normCone - step); changedCone = true; }
+      else if (k === 'ArrowUp') { targetDist = Math.max(0, normDist - step); changedDist = true; }
+      else if (k === 'ArrowDown') { targetDist = Math.min(1, normDist + step); changedDist = true; }
+      else if (k === 'PageUp') { targetDist = Math.max(0, normDist - 0.10); changedDist = true; }
+      else if (k === 'PageDown') { targetDist = Math.min(1, normDist + 0.10); changedDist = true; }
+      else if (k === '[') { targetAngle = Math.max(0, normAngle - 0.05); changedAngle = true; }
+      else if (k === ']') { targetAngle = Math.min(1, normAngle + 0.05); changedAngle = true; }
+      else if (k === 'Home') { targetCone = 0; targetDist = 0; changedCone = true; changedDist = true; }
+      else if (k === 'End') { targetCone = 1; targetDist = 1; changedCone = true; changedDist = true; }
+      else if (k === 'Delete' || k === 'Backspace') {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        commitMicReset();
+        return;
+      } else {
+        return;
+      }
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      normCone = targetCone;
+      normDist = targetDist;
+      normAngle = targetAngle;
+      if (changedCone && stCone) {
+        if (typeof stCone.sliderDragStarted === 'function') stCone.sliderDragStarted();
+        stCone.setNormalisedValue(targetCone);
+        if (typeof stCone.sliderDragEnded === 'function') stCone.sliderDragEnded();
+      }
+      if (changedDist && stDist) {
+        if (typeof stDist.sliderDragStarted === 'function') stDist.sliderDragStarted();
+        stDist.setNormalisedValue(targetDist);
+        if (typeof stDist.sliderDragEnded === 'function') stDist.sliderDragEnded();
+      }
+      if (changedAngle && stAngle) {
+        if (typeof stAngle.sliderDragStarted === 'function') stAngle.sliderDragStarted();
+        stAngle.setNormalisedValue(targetAngle);
+        if (typeof stAngle.sliderDragEnded === 'function') stAngle.sliderDragEnded();
+      }
+      normCone = targetCone;
+      normDist = targetDist;
+      normAngle = targetAngle;
+      markRigPresetDirty();
       draw();
     });
 
-    if (stCone)  stCone.valueChangedEvent.addListener(syncFromState);
-    if (stDist)  stDist.valueChangedEvent.addListener(syncFromState);
-    if (stAngle) stAngle.valueChangedEvent.addListener(syncFromState);
-    if (stDrive) stDrive.valueChangedEvent.addListener(syncFromState);
+    if (stCone) {
+      stCone.valueChangedEvent.addListener(syncFromState);
+      if (stCone.propertiesChangedEvent && typeof stCone.propertiesChangedEvent.addListener === 'function') stCone.propertiesChangedEvent.addListener(syncFromState);
+    }
+    if (stDist) {
+      stDist.valueChangedEvent.addListener(syncFromState);
+      if (stDist.propertiesChangedEvent && typeof stDist.propertiesChangedEvent.addListener === 'function') stDist.propertiesChangedEvent.addListener(syncFromState);
+    }
+    if (stAngle) {
+      stAngle.valueChangedEvent.addListener(syncFromState);
+      if (stAngle.propertiesChangedEvent && typeof stAngle.propertiesChangedEvent.addListener === 'function') stAngle.propertiesChangedEvent.addListener(syncFromState);
+    }
+    if (stDrive) {
+      stDrive.valueChangedEvent.addListener(syncFromState);
+      if (stDrive.propertiesChangedEvent && typeof stDrive.propertiesChangedEvent.addListener === 'function') stDrive.propertiesChangedEvent.addListener(syncFromState);
+    }
     if (stPhase) stPhase.valueChangedEvent.addListener(syncFromState);
     if (stMicM)  stMicM.valueChangedEvent.addListener(draw);
     if (stPreM)  stPreM.valueChangedEvent.addListener(draw);
@@ -1617,19 +2556,26 @@
     };
   }
 
+  let updateRigDerivedUiFn = null;
   function bindSeg (elId, paramId, defIdx, onChange) {
     const el = $(elId);
     const st = comboState(paramId);
     const btns = [...el.querySelectorAll('button')];
     const idxOfBtn = (b, j) => b.dataset.idx !== undefined ? Number(b.dataset.idx) : j;
     const apply = choiceIdx => {
-      btns.forEach((b, j) => b.classList.toggle('on', idxOfBtn(b, j) === choiceIdx));
+      btns.forEach((b, j) => {
+        const isOn = idxOfBtn(b, j) === choiceIdx;
+        b.classList.toggle('on', isOn);
+        if (typeof b.setAttribute === 'function') b.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+      });
       if (onChange) onChange(choiceIdx);
+      if (updateRigDerivedUiFn) updateRigDerivedUiFn();
     };
     btns.forEach((b, j) => b.addEventListener('click', () => {
       const choiceIdx = idxOfBtn(b, j);
       if (st) st.setChoiceIndex(choiceIdx);
       apply(choiceIdx);
+      markRigPresetDirty();
     }));
     if (st) {
       const from = () => {
@@ -1648,16 +2594,54 @@
     }
   }
 
+  function bindSelect (elId, paramId, defIdx, onChange) {
+    const el = $(elId);
+    if (!el) return;
+    const st = comboState(paramId);
+    const apply = choiceIdx => {
+      const strIdx = String(choiceIdx);
+      if (el.value !== strIdx) el.value = strIdx;
+      if (onChange) onChange(choiceIdx);
+    };
+    el.addEventListener('change', () => {
+      const nOpts = (el.options && el.options.length > 0) ? el.options.length : 1;
+      const choiceIdx = Math.max(0, Math.min(nOpts - 1, Math.round(Number(el.value) || 0)));
+      if (st) st.setChoiceIndex(choiceIdx);
+      apply(choiceIdx);
+      markRigPresetDirty();
+    });
+    if (st) {
+      const from = () => {
+        const n = ((st.properties && st.properties.choices) || []).length;
+        const nOpts = (el.options && el.options.length > 0) ? el.options.length : 1;
+        const maxIdx = Math.max(1, n > 1 ? n - 1 : nOpts - 1);
+        const idx = (typeof st.getChoiceIndex === 'function' && n > 1)
+          ? st.getChoiceIndex()
+          : Math.round((st.value || 0) * maxIdx);
+        apply(Math.max(0, Math.min(maxIdx, idx)));
+      };
+      st.valueChangedEvent.addListener(from);
+      if (st.propertiesChangedEvent) st.propertiesChangedEvent.addListener(from);
+      from();
+    } else {
+      apply(defIdx || 0);
+    }
+  }
+
   function bindToggle (elId, paramId, defVal, onChange) {
     const el = $(elId);
     const st = toggleState(paramId);
     const apply = v => {
-      el.classList.toggle('on', !!v);
-      if (onChange) onChange(!!v);
+      const isOn = !!v;
+      el.classList.toggle('on', isOn);
+      if (typeof el.setAttribute === 'function') el.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+      if (onChange) onChange(isOn);
+      if (updateRigDerivedUiFn) updateRigDerivedUiFn();
     };
     el.addEventListener('click', () => {
       if (st) { st.setValue(!st.getValue()); apply(st.getValue()); }
       else apply(!el.classList.contains('on'));
+      markRigPresetDirty();
     });
     if (st) {
       st.valueChangedEvent.addListener(() => apply(st.getValue()));
@@ -1672,6 +2656,43 @@
   let scopeFillGrad = null, scopeFillGradH = 0;
   let telemRafPending = false;
   let lastCustomWaveA = [], lastCustomWaveB = [];
+  let prevIrOverrideA = false, prevIrOverrideB = false;
+  const syncIrOverrideControls = (cardId, segId, micBtnId, params, overridden) => {
+    const micBtn = $(micBtnId);
+    const segEl = $(segId);
+    const card = $(cardId);
+    const targets = [];
+    if (micBtn) targets.push({ el: micBtn, isKnob: false });
+    if (segEl && typeof segEl.querySelectorAll === 'function') {
+      for (const b of segEl.querySelectorAll('button')) {
+        targets.push({ el: b, isKnob: false });
+      }
+    }
+    if (card && typeof card.querySelectorAll === 'function') {
+      const pSet = new Set(params);
+      for (const k of card.querySelectorAll('.knob')) {
+        if (k && k.dataset && pSet.has(k.dataset.param)) {
+          targets.push({ el: k, isKnob: true });
+        }
+      }
+    }
+    for (const { el, isKnob } of targets) {
+      if (overridden) {
+        el.tabIndex = -1;
+        if (typeof el.setAttribute === 'function') {
+          el.setAttribute('tabindex', '-1');
+          el.setAttribute('aria-disabled', 'true');
+        }
+      } else {
+        el.tabIndex = 0;
+        if (typeof el.setAttribute === 'function') {
+          if (isKnob) el.setAttribute('tabindex', '0');
+          else if (typeof el.removeAttribute === 'function') el.removeAttribute('tabindex');
+        }
+        if (typeof el.removeAttribute === 'function') el.removeAttribute('aria-disabled');
+      }
+    }
+  };
   const domPrevWidth = new WeakMap();
   const domPrevBg = new WeakMap();
   function setTextCached (el, val) {
@@ -1692,23 +2713,31 @@
     }
   }
 
+  const SCOPE_PAD = { l: 44, r: 44, t: 8, b: 16 };
   function drawScopeGrid (gg, w, h, xOfFreq, yOfDb) {
-    gg.strokeStyle = '#22242a'; gg.lineWidth = 1;
-    gg.fillStyle = '#8e94a0'; gg.font = '600 8.5px "JetBrains Mono", monospace';
+    const { l: padL, r: padR, t: padT, b: padB } = SCOPE_PAD;
+    const xEnd = w - padR;
+    const yEnd = h - padB;
+    gg.strokeStyle = '#262933'; gg.lineWidth = 1;
+    gg.fillStyle = '#949aa6'; gg.font = '600 10px "JetBrains Mono", "Cascadia Mono", Consolas, Barlow, monospace';
+    gg.textAlign = 'center';
     for (const f of [50, 100, 250, 500, 1000, 2500, 5000, 10000]) {
       const x = xOfFreq(f);
-      gg.beginPath(); gg.moveTo(x, 0); gg.lineTo(x, h); gg.stroke();
-      gg.fillText(f >= 1000 ? (f / 1000) + 'k' : String(f), x + 3, h - 4);
+      gg.beginPath(); gg.moveTo(x, padT); gg.lineTo(x, yEnd); gg.stroke();
+      gg.fillText(f >= 1000 ? (f / 1000) + 'k' : String(f), x, h - 3);
     }
     for (const [dbVal, label, ohmLabel] of [[12, '+12dB', '54Ω'], [0, '0dB', '13.5Ω'], [-6, '-6dB', '6.8Ω']]) {
       const y = yOfDb(dbVal);
-      gg.strokeStyle = (dbVal === 0) ? 'rgba(255, 126, 182, 0.16)' : '#1d1f25';
-      gg.beginPath(); gg.moveTo(0, y); gg.lineTo(w, y); gg.stroke();
-      gg.fillStyle = (dbVal === 0) ? '#ff7eb6' : '#6c727f';
-      gg.fillText(label, 5, y - 2);
+      gg.strokeStyle = (dbVal === 0) ? 'rgba(255, 126, 182, 0.22)' : '#1d1f25';
+      gg.beginPath(); gg.moveTo(padL, y); gg.lineTo(xEnd, y); gg.stroke();
+      gg.fillStyle = (dbVal === 0) ? '#ff7eb6' : '#949aa6';
+      gg.textAlign = 'left';
+      gg.fillText(label, 4, y + 3);
       gg.fillStyle = '#ff6b6b';
-      gg.fillText(ohmLabel, w - 34, y - 2);
+      gg.textAlign = 'right';
+      gg.fillText(ohmLabel, w - 4, y + 3);
     }
+    gg.textAlign = 'left';
   }
 
   function drawScope () {
@@ -1724,8 +2753,11 @@
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.clearRect(0, 0, w, h);
 
-    const xOfFreq = f => (Math.log(f / 20) / Math.log(20000 / 20)) * w;
-    const yOfDb   = db => h * 0.50 - (db / 18.0) * (h * 0.40);
+    const { l: padL, r: padR, t: padT, b: padB } = SCOPE_PAD;
+    const plotW = Math.max(20, w - padL - padR);
+    const plotH = Math.max(20, h - padT - padB);
+    const xOfFreq = f => padL + (Math.log(f / 20) / Math.log(20000 / 20)) * plotW;
+    const yOfDb   = db => padT + plotH * 0.50 - (db / 18.0) * (plotH * 0.40);
 
     // Cached static grid & dB/Ohm axis labels on offscreen canvas when drawImage is available
     if (typeof g.drawImage === 'function') {
@@ -1744,29 +2776,45 @@
       drawScopeGrid(g, w, h, xOfFreq, yOfDb);
     }
 
-    // Dynamic speaker resonant frequency marker Fs(x)
-    const fsVal     = Math.max(20, Math.min(20000, telem.effectiveFsHz || 96));
-    const xFs       = xOfFreq(fsVal);
-    const excurNorm = Math.max(0, Math.min(1, (telem.coneExcursionMm || 0) / 1.8));
+    const stPwrAmp = toggleState('powerAmpEnabled');
+    const stCabA   = toggleState('cabEnabled');
+    const stCabB   = toggleState('cabBEnabled');
+    const isBtnOn  = id => {
+      const el = $(id);
+      return !!(el && el.classList && el.classList.contains('on'));
+    };
+    const pwrAmpOn = stPwrAmp
+      ? !!stPwrAmp.getValue()
+      : (!!($('rigModeSeg') && typeof $('rigModeSeg').querySelector === 'function' && $('rigModeSeg').querySelector('button[data-mode="amp"].on, button[data-mode="ampcab"].on')) || isBtnOn('powerAmpBtn'));
+    const cabAOn = stCabA ? !!stCabA.getValue() : isBtnOn('cabBtn');
+    const cabBOn = stCabB ? !!stCabB.getValue() : isBtnOn('cabBBtn');
+    const showMotorOverlays = pwrAmpOn || cabAOn || cabBOn;
 
-    g.strokeStyle = 'rgba(255, 209, 102, ' + (0.30 + 0.50 * excurNorm).toFixed(2) + ')';
-    g.lineWidth = 1.0 + 1.2 * excurNorm;
-    g.setLineDash([3, 3]);
-    g.beginPath(); g.moveTo(xFs, 0); g.lineTo(xFs, h); g.stroke();
-    g.setLineDash([]);
+    // Dynamic speaker resonant frequency marker Fs(x)
+    if (showMotorOverlays) {
+      const fsVal     = Math.max(20, Math.min(20000, telem.effectiveFsHz || 96));
+      const xFs       = xOfFreq(fsVal);
+      const excurNorm = Math.max(0, Math.min(1, (telem.coneExcursionMm || 0) / 1.8));
+
+      g.strokeStyle = 'rgba(255, 209, 102, ' + (0.30 + 0.50 * excurNorm).toFixed(2) + ')';
+      g.lineWidth = 1.0 + 1.2 * excurNorm;
+      g.setLineDash([3, 3]);
+      g.beginPath(); g.moveTo(xFs, padT); g.lineTo(xFs, h - padB); g.stroke();
+      g.setLineDash([]);
+    }
 
     // Layer 1: Subtle under-curve fill for Acoustic Sum
     g.beginPath();
-    g.moveTo(0, h);
+    g.moveTo(padL, h - padB);
     for (let i = 0; i < N; i++) {
-      const x = (i / (N - 1)) * w;
+      const x = padL + (i / (N - 1)) * plotW;
       g.lineTo(x, yOfDb(curveDb[i]));
     }
-    g.lineTo(w, h);
+    g.lineTo(padL + plotW, h - padB);
     g.closePath();
     if (!scopeFillGrad || scopeFillGradH !== h) {
       scopeFillGradH = h;
-      scopeFillGrad = g.createLinearGradient(0, 0, 0, h);
+      scopeFillGrad = g.createLinearGradient(0, padT, 0, h - padB);
       scopeFillGrad.addColorStop(0, 'rgba(255, 126, 182, 0.10)');
       scopeFillGrad.addColorStop(0.6, 'rgba(110, 198, 255, 0.03)');
       scopeFillGrad.addColorStop(1, 'rgba(0, 0, 0, 0.0)');
@@ -1782,7 +2830,7 @@
       g.strokeStyle = '#6ec6ff';
       g.beginPath();
       for (let i = 0; i < N; i++) {
-        const x = (i / (N - 1)) * w, y = yOfDb(curveCabADb[i]);
+        const x = padL + (i / (N - 1)) * plotW, y = yOfDb(curveCabADb[i]);
         if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
       }
       g.stroke();
@@ -1790,7 +2838,7 @@
       g.strokeStyle = '#ffd166';
       g.beginPath();
       for (let i = 0; i < N; i++) {
-        const x = (i / (N - 1)) * w, y = yOfDb(curveCabBDb[i]);
+        const x = padL + (i / (N - 1)) * plotW, y = yOfDb(curveCabBDb[i]);
         if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
       }
       g.stroke();
@@ -1798,10 +2846,10 @@
     }
 
     // Layer 3: Live Speaker Electrical Impedance Curve Z(f) (#ff6b6b Kita Red)
-    if (curveImpedanceDb.length === N) {
+    if (showMotorOverlays && curveImpedanceDb.length === N) {
       g.beginPath();
       for (let i = 0; i < N; i++) {
-        const x = (i / (N - 1)) * w;
+        const x = padL + (i / (N - 1)) * plotW;
         const y = yOfDb(curveImpedanceDb[i]);
         if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
       }
@@ -1813,13 +2861,143 @@
     // Layer 4: Combined Acoustic Response Curve (#ff7eb6 Bocchi Pink)
     g.beginPath();
     for (let i = 0; i < N; i++) {
-      const x = (i / (N - 1)) * w;
+      const x = padL + (i / (N - 1)) * plotW;
       const y = yOfDb(curveDb[i]);
       if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
     }
     g.strokeStyle = '#ff7eb6';
     g.lineWidth = 1.9;
     g.stroke();
+  }
+
+  function syncCustomIrWaves (src) {
+    if (!src) return;
+    if (Array.isArray(src.cabACustomIrWave)) {
+      lastCustomWaveA = src.cabACustomIr ? src.cabACustomIrWave : [];
+    } else if (!src.cabACustomIr) {
+      lastCustomWaveA = [];
+    }
+    if (Array.isArray(src.cabBCustomIrWave)) {
+      lastCustomWaveB = src.cabBCustomIr ? src.cabBCustomIrWave : [];
+    } else if (!src.cabBCustomIr) {
+      lastCustomWaveB = [];
+    }
+  }
+
+  let lastSyncedRigViewKey = null;
+  let pendingTelePreferAmpCab = false;
+  let syncRigModeFromTelemetryFn = null;
+  let dismissPendingIrConfirmFn = null;
+  let lastSyncedAbSlot = null;
+  function syncPresetFromTelemetry (src) {
+    if (presetSyncInFlight > 0) return;
+    if (!src || typeof src.activePresetIndex !== 'number' || !Number.isFinite(src.activePresetIndex)) return;
+    const hasUserIr = !!(src.cabACustomIr || src.cabBCustomIr);
+    const rawIdx = hasUserIr ? -1 : Math.trunc(src.activePresetIndex);
+    if (rawIdx === lastSyncedTelemetryPreset) return;
+    const presetSel = $('rigPresetSel');
+    const maxIdx = 11;
+    if (rawIdx >= 0 && rawIdx <= maxIdx) {
+      lastSyncedTelemetryPreset = rawIdx;
+      if (presetSel && presetSel.value !== String(rawIdx)) {
+        presetSel.value = String(rawIdx);
+      }
+    } else if (rawIdx === -1) {
+      lastSyncedTelemetryPreset = -1;
+      if (presetSel && presetSel.value !== '') {
+        presetSel.value = '';
+      }
+    }
+  }
+
+  function syncAbFromTelemetry (src) {
+    if (!src) return;
+    const slot = (src.abSlotActive === 1 || src.abSlotActive === true) ? 1 : 0;
+    if (lastSyncedAbSlot !== null && slot !== lastSyncedAbSlot && dismissPendingIrConfirmFn) {
+      dismissPendingIrConfirmFn(false);
+    }
+    lastSyncedAbSlot = slot;
+    const btnA = $('abSlotABtn');
+    const btnB = $('abSlotBBtn');
+    if (btnA) {
+      if (btnA.classList) btnA.classList.toggle('on', slot === 0);
+      if (typeof btnA.setAttribute === 'function') btnA.setAttribute('aria-pressed', slot === 0 ? 'true' : 'false');
+    }
+    if (btnB) {
+      if (btnB.classList) btnB.classList.toggle('on', slot === 1);
+      if (typeof btnB.setAttribute === 'function') btnB.setAttribute('aria-pressed', slot === 1 ? 'true' : 'false');
+    }
+  }
+
+  const readToggleBool = (paramId, btnId, defVal) => {
+    const st = toggleState(paramId);
+    if (st && typeof st.getValue === 'function') return !!st.getValue();
+    const btn = $(btnId);
+    if (btn && btn.classList) return btn.classList.contains('on');
+    return defVal;
+  };
+  function syncBypassUi () {
+    const cabAOn  = readToggleBool('cabEnabled', 'cabBtn', true);
+    const micAOn  = readToggleBool('micEnabled', 'micBtn', true);
+    const cabBOn  = readToggleBool('cabBEnabled', 'cabBBtn', true);
+    const micBOn  = readToggleBool('micBEnabled', 'micBBtn', true);
+    const roomOn  = readToggleBool('roomEnabled', 'roomBtn', true);
+    const loadOn  = readToggleBool('loadEnabled', 'loadBtn', false);
+    const gateOn  = readToggleBool('gateEnabled', 'gateBtn', false);
+    const boostOn = readToggleBool('boostEnabled', 'boostBtn', false);
+    const preOn   = readToggleBool('preampEnabled', 'preampBtn', false);
+    const pwrOn   = readToggleBool('powerAmpEnabled', 'powerAmpBtn', false);
+    const fxOn    = readToggleBool('fxLoopEnabled', 'fxLoopBtn', false);
+
+    const setCardBypass = (cardId, badgeId, bypassed) => {
+      const card = $(cardId);
+      const badge = $(badgeId);
+      if (card && card.classList) card.classList.toggle('module-bypassed', !!bypassed);
+      if (badge) badge.hidden = !bypassed;
+    };
+    setCardBypass('cardCabA', 'bypassBadgeCabA', !cabAOn);
+    setCardBypass('cardCabB', 'bypassBadgeCabB', !cabBOn);
+    setCardBypass('cardRoom', 'bypassBadgeRoom', !roomOn);
+    setCardBypass('cardPreamp', 'bypassBadgePreamp', !preOn);
+    setCardBypass('cardFullPower', 'bypassBadgeFullPower', !pwrOn);
+    setCardBypass('cardFxLoop', 'bypassBadgeFxLoop', !fxOn);
+    setCardBypass('cardLoadGateBoost', 'bypassBadgeFrontEnd', !loadOn && !gateOn && !boostOn);
+
+    const subLoad = $('subDeckLoad');
+    if (subLoad && subLoad.classList) subLoad.classList.toggle('sub-bypassed', !loadOn && (gateOn || boostOn));
+    const gateKnobsEl = $('gateKnobs');
+    if (gateKnobsEl && gateKnobsEl.classList) gateKnobsEl.classList.toggle('mic-sub-bypassed', !gateOn && (loadOn || boostOn));
+    const boostKnobsEl = $('boostKnobs');
+    if (boostKnobsEl && boostKnobsEl.classList) boostKnobsEl.classList.toggle('mic-sub-bypassed', !boostOn && (loadOn || gateOn));
+
+    const micASubBypass = cabAOn && !micAOn;
+    for (const id of ['micStageWrapA', 'cabAKnobsBot', 'micModelSeg', 'micPreModelSeg']) {
+      const el = $(id);
+      if (el && el.classList) el.classList.toggle('mic-sub-bypassed', micASubBypass);
+    }
+    const micBSubBypass = cabBOn && !micBOn;
+    for (const id of ['micStageWrapB', 'cabBKnobsBot', 'micBModelSeg', 'micBPreModelSeg']) {
+      const el = $(id);
+      if (el && el.classList) el.classList.toggle('mic-sub-bypassed', micBSubBypass);
+    }
+  }
+
+  let cabADeltaOn = false;
+  let cabBDeltaOn = false;
+  function syncCabDeltaFromTelemetry (src) {
+    if (!src) return;
+    if (typeof src.cabADelta === 'boolean') cabADeltaOn = src.cabADelta;
+    if (typeof src.cabBDelta === 'boolean') cabBDeltaOn = src.cabBDelta;
+    const btnA = $('cabADeltaBtn');
+    const btnB = $('cabBDeltaBtn');
+    if (btnA) {
+      if (btnA.classList) btnA.classList.toggle('on', cabADeltaOn);
+      if (typeof btnA.setAttribute === 'function') btnA.setAttribute('aria-pressed', cabADeltaOn ? 'true' : 'false');
+    }
+    if (btnB) {
+      if (btnB.classList) btnB.classList.toggle('on', cabBDeltaOn);
+      if (typeof btnB.setAttribute === 'function') btnB.setAttribute('aria-pressed', cabBDeltaOn ? 'true' : 'false');
+    }
   }
 
   function updateTelemetryUI () {
@@ -1850,6 +3028,15 @@
     setTextCached($('valBPlus'),     impLabel);
     setTextCached($('valPwrTemp'),   fsLabel + ' · Q ' + qts.toFixed(2));
     setTextCached($('valVcTemp'),    vcC.toFixed(1) + ' °C');
+
+    const bPlusV = Number.isFinite(telem.plateBPlusVolts) ? telem.plateBPlusVolts : 460.0;
+    const sagRaw = Number.isFinite(telem.sagReductionDb)  ? telem.sagReductionDb  : 0.0;
+    const v1C    = Number.isFinite(telem.v1AnodeTempC)    ? telem.v1AnodeTempC    : 115.0;
+    const pwrC   = Number.isFinite(telem.powerTubeTempC)  ? telem.powerTubeTempC  : 165.0;
+    setTextCached($('ampBPlusVal'),   bPlusV.toFixed(1) + ' V');
+    setTextCached($('ampSagVal'),     sagRaw.toFixed(2) + ' dB');
+    setTextCached($('ampV1TempVal'),  v1C.toFixed(1) + ' °C');
+    setTextCached($('ampPwrTempVal'), pwrC.toFixed(1) + ' °C');
 
     const excurPct = Math.max(2, Math.min(100, (excur / 1.8) * 100));
     const impPct   = Math.max(4, Math.min(100, ((imp - 0.5) / 1.5) * 65 + (sagDb / 4.0) * 35));
@@ -1908,28 +3095,53 @@
 
     const irA = !!telem.cabACustomIr;
     const irB = !!telem.cabBCustomIr;
-    if (Array.isArray(telem.cabACustomIrWave)) {
-      lastCustomWaveA = irA ? telem.cabACustomIrWave : [];
-    } else if (!irA) {
-      lastCustomWaveA = [];
-    }
-    if (Array.isArray(telem.cabBCustomIrWave)) {
-      lastCustomWaveB = irB ? telem.cabBCustomIrWave : [];
-    } else if (!irB) {
-      lastCustomWaveB = [];
-    }
+    syncCustomIrWaves(telem);
+    syncPresetFromTelemetry(telem);
+    syncAbFromTelemetry(telem);
+    syncCabDeltaFromTelemetry(telem);
+    if (syncRigModeFromTelemetryFn) syncRigModeFromTelemetryFn(telem);
     if ($('cardCabA')) $('cardCabA').classList.toggle('ir-override', irA);
     if ($('cardCabB')) $('cardCabB').classList.toggle('ir-override', irB);
-    if ($('irLoadABtn')) $('irLoadABtn').classList.toggle('on', irA);
-    if ($('irLoadBBtn')) $('irLoadBBtn').classList.toggle('on', irB);
-    if ($('irClearABtn')) $('irClearABtn').style.display = irA ? 'inline-flex' : 'none';
-    if ($('irClearBBtn')) $('irClearBBtn').style.display = irB ? 'inline-flex' : 'none';
+    if (prevIrOverrideA !== irA) {
+      prevIrOverrideA = irA;
+      syncIrOverrideControls('cardCabA', 'micModelSeg', 'micBtn', ['micOffAxis', 'micDrive', 'cabALoResDb', 'cabAHiResDb', 'cabBoxScale', 'cabConeDamp'], irA);
+    }
+    if (prevIrOverrideB !== irB) {
+      prevIrOverrideB = irB;
+      syncIrOverrideControls('cardCabB', 'micBModelSeg', 'micBBtn', ['micBOffAxis', 'micBDrive', 'cabBLoResDb', 'cabBHiResDb', 'cabBBoxScale', 'cabBConeDamp'], irB);
+    }
+    if ($('irLoadABtn')) {
+      $('irLoadABtn').classList.toggle('on', irA);
+      if (typeof $('irLoadABtn').setAttribute === 'function') $('irLoadABtn').setAttribute('aria-pressed', irA ? 'true' : 'false');
+    }
+    if ($('irLoadBBtn')) {
+      $('irLoadBBtn').classList.toggle('on', irB);
+      if (typeof $('irLoadBBtn').setAttribute === 'function') $('irLoadBBtn').setAttribute('aria-pressed', irB ? 'true' : 'false');
+    }
+    const syncClearIrBtn = (btn, active) => {
+      if (!btn) return;
+      if (btn.style) {
+        btn.style.display = 'inline-flex';
+        btn.style.visibility = active ? 'visible' : 'hidden';
+        btn.style.pointerEvents = active ? 'auto' : 'none';
+      }
+      btn.tabIndex = active ? 0 : -1;
+      if (active) {
+        if (typeof btn.removeAttribute === 'function') btn.removeAttribute('aria-hidden');
+      } else {
+        if (typeof btn.setAttribute === 'function') btn.setAttribute('aria-hidden', 'true');
+      }
+    };
+    syncClearIrBtn($('irClearABtn'), irA);
+    syncClearIrBtn($('irClearBBtn'), irB);
     if (stageA && typeof stageA.setCustomIr === 'function') {
       stageA.setCustomIr(irA, telem.cabACustomIrName || '', lastCustomWaveA);
     }
     if (stageB && typeof stageB.setCustomIr === 'function') {
       stageB.setCustomIr(irB, telem.cabBCustomIrName || '', lastCustomWaveB);
     }
+    syncBypassUi();
+    if (updateRigDerivedUiFn) updateRigDerivedUiFn();
 
     drawScope();
   }
@@ -1939,9 +3151,17 @@
     if (bus) {
       try { Juce = await import(location.href.replace(/[^/]*$/, '') + 'juce/index.js'); }
       catch (_) { Juce = null; }
+      if (Juce && typeof Juce.getNativeFunction === 'function') {
+        try { bringToFrontNative = Juce.getNativeFunction('bringToFront'); } catch (_) { bringToFrontNative = null; }
+      }
       window.__JUCE__.backend.addEventListener('telemetry', d => {
         if (!d) return;
         telem = d;
+        syncCustomIrWaves(d);
+        syncPresetFromTelemetry(d);
+        syncAbFromTelemetry(d);
+        syncCabDeltaFromTelemetry(d);
+        if (syncRigModeFromTelemetryFn) syncRigModeFromTelemetryFn(d);
         if (Array.isArray(d.curveDb) && d.curveDb.length === N) {
           curveDb = d.curveDb;
         }
@@ -1975,59 +3195,262 @@
     const fmtLpf = v => v >= 19900 ? 'Off' : (v / 1000).toFixed(1) + ' kHz';
     const fmtPan = v => Math.abs(v) < 0.02 ? 'C' : (v < 0 ? Math.round(-v * 100) + 'L' : Math.round(v * 100) + 'R');
     const fmtImp = v => v.toFixed(2) + 'x (' + (v < 0.72 ? '4Ω' : (v > 1.35 ? '16Ω' : '8Ω')) + ')';
+    const fmtDly = v => v < 0.005 ? 'Off' : v.toFixed(2) + ' ms';
+    const fmtPreDly = v => v < 0.05 ? 'Off' : (v < 10 ? v.toFixed(1) : Math.round(v)) + ' ms';
 
-    // Hidden Front-End Amp Relays (keeps all 83 APVTS WebView2 relays bound)
+    // Persistent non-shifting Error Banner
+    let uiErrorSource = null;
+    const showUiError = (msg, source = null) => {
+      uiErrorSource = source;
+      const banner = $('uiErrorBanner');
+      const txtEl  = $('uiErrorText');
+      if (txtEl) txtEl.textContent = msg;
+      if (banner) banner.hidden = false;
+    };
+    const clearUiError = (source = null) => {
+      if (source !== null && uiErrorSource !== source) return;
+      uiErrorSource = null;
+      const banner = $('uiErrorBanner');
+      if (banner) banner.hidden = true;
+    };
+    const errDismissBtn = $('uiErrorDismissBtn');
+    if (errDismissBtn) errDismissBtn.addEventListener('click', () => clearUiError());
+
+    // Header 3-Way Rig Mode Switch (CAB ONLY | AMP & LOAD | AMP + CABS)
+    let rigMode = 'cab';
+    const activeSegText = (segId, fallback) => {
+      const seg = $(segId);
+      if (!seg || typeof seg.querySelector !== 'function') return fallback;
+      const onBtn = seg.querySelector('button.on');
+      return (onBtn && onBtn.textContent) ? onBtn.textContent.trim() : fallback;
+    };
+    updateRigDerivedUiFn = () => {
+      syncBypassUi();
+      const summaryBtn = $('bgRigSummaryBtn');
+      const stageEl = $('stage');
+      const showBg = (rigMode === 'amp' || rigMode === 'ampcab');
+      if (stageEl && stageEl.classList) stageEl.classList.toggle('has-bg-summary', showBg);
+      if (!summaryBtn) return;
+      if (!showBg) {
+        summaryBtn.style.display = 'none';
+        return;
+      }
+      summaryBtn.style.display = 'flex';
+      if (rigMode === 'amp') {
+        const cabA = readToggleBool('cabEnabled', 'cabBtn', true) ? ('Cab A: ' + activeSegText('cabModelSeg', 'Modern 4x12') + (telem.cabACustomIr ? ' [User IR]' : '')) : 'Cab A: Bypassed';
+        const cabB = readToggleBool('cabBEnabled', 'cabBBtn', true) ? ('Cab B: ' + activeSegText('cabBModelSeg', 'Vintage 4x12') + (telem.cabBCustomIr ? ' [User IR]' : '')) : 'Cab B: Bypassed';
+        const room = readToggleBool('roomEnabled', 'roomBtn', true) ? ('Room: ' + activeSegText('roomTypeSeg', 'Wood Room')) : 'Room: Bypassed';
+        summaryBtn.textContent = 'OUTPUT STAGE ACTIVE — ' + cabA + '  |  ' + cabB + '  |  ' + room + '   [Edit Cabs & Room →]';
+      } else {
+        const stages = [];
+        if (readToggleBool('loadEnabled', 'loadBtn', false)) stages.push('WD Load');
+        if (readToggleBool('gateEnabled', 'gateBtn', false)) stages.push('Gate');
+        if (readToggleBool('boostEnabled', 'boostBtn', false)) stages.push('OD (' + activeSegText('boostTopoSeg', 'SD-1') + ')');
+        if (readToggleBool('preampEnabled', 'preampBtn', false)) stages.push('Preamp (' + activeSegText('channelSeg', 'Lead') + ')');
+        if (readToggleBool('powerAmpEnabled', 'powerAmpBtn', false)) stages.push('Power (' + activeSegText('ampPowerTubeSeg', '6L6 · Tight') + ')');
+        if (readToggleBool('fxLoopEnabled', 'fxLoopBtn', false)) stages.push('FX (' + activeSegText('fxLoopModeSeg', 'Spring') + ')');
+        summaryBtn.textContent = 'AMP CHAIN ACTIVE — ' + (stages.length ? stages.join(' → ') : 'All Amp Stages Bypassed') + '   [Edit Amp & Load →]';
+      }
+    };
+    const applyRigModeDom = mode => {
+      const isCabDeck   = (mode === 'cab' || mode === 'ampcab');
+      const isAmpActive = (mode === 'amp' || mode === 'ampcab');
+      const cabDeck = $('cabDeckRow'), cabBot = $('cabBottomRow');
+      const ampDeck = $('ampDeckRow'), ampBot = $('ampBottomRow');
+      if (cabDeck) cabDeck.style.display = isCabDeck ? 'grid' : 'none';
+      if (cabBot)  cabBot.style.display  = isCabDeck ? 'grid' : 'none';
+      if (ampDeck) ampDeck.style.display = isCabDeck ? 'none' : 'grid';
+      if (ampBot)  ampBot.style.display  = isCabDeck ? 'none' : 'grid';
+      const titleEl = $('brandTitle') || (typeof document.querySelector === 'function' ? document.querySelector('.brand-title') : null);
+      if (titleEl) titleEl.textContent = isAmpActive ? 'WD AMP' : 'WD CAB';
+      const segEl = $('rigModeSeg');
+      if (segEl) {
+        for (const b of segEl.querySelectorAll('button')) {
+          const isOn = b.dataset.mode === mode;
+          b.classList.toggle('on', isOn);
+          if (typeof b.setAttribute === 'function') b.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+        }
+      }
+      if (updateRigDerivedUiFn) updateRigDerivedUiFn();
+      if (isCabDeck) {
+        if (stageA && typeof stageA.draw === 'function') stageA.draw();
+        if (stageB && typeof stageB.draw === 'function') stageB.draw();
+      }
+      if (!window.__wdUiBootPending) drawScope();
+    };
+    const isPowerAmpActive = () => {
+      const stPwr = toggleState('powerAmpEnabled');
+      if (stPwr) return !!stPwr.getValue();
+      return rigMode === 'amp' || rigMode === 'ampcab';
+    };
+    const syncRigModeFromPowerAmp = enabled => {
+      if (enabled) {
+        if (rigMode === 'cab') {
+          rigMode = pendingTelePreferAmpCab ? 'ampcab' : 'amp';
+        }
+        pendingTelePreferAmpCab = false;
+      } else {
+        rigMode = 'cab';
+        pendingTelePreferAmpCab = false;
+      }
+      applyRigModeDom(rigMode);
+    };
+    syncRigModeFromTelemetryFn = src => {
+      if (!src || typeof src.preferAmpCab !== 'boolean') return;
+      const slot = (src.abSlotActive === 1 || src.abSlotActive === true) ? 1 : 0;
+      const key = slot + ':' + (src.preferAmpCab ? '1' : '0');
+      if (key === lastSyncedRigViewKey) return;
+      lastSyncedRigViewKey = key;
+      if (src.preferAmpCab) {
+        if (isPowerAmpActive()) {
+          pendingTelePreferAmpCab = false;
+          if (rigMode !== 'ampcab') {
+            rigMode = 'ampcab';
+            applyRigModeDom(rigMode);
+          }
+        } else {
+          pendingTelePreferAmpCab = true;
+        }
+      } else {
+        pendingTelePreferAmpCab = false;
+        if (rigMode === 'ampcab' && isPowerAmpActive()) {
+          rigMode = 'amp';
+          applyRigModeDom(rigMode);
+        }
+      }
+    };
+    const switchRigMode = mode => {
+      const prevRigMode = rigMode;
+      const wantPowerAmp = (mode === 'amp' || mode === 'ampcab');
+      const stPwr = toggleState('powerAmpEnabled');
+      let pwrChanged = false;
+      if (stPwr && !!stPwr.getValue() !== wantPowerAmp) {
+        stPwr.setValue(wantPowerAmp);
+        pwrChanged = true;
+      }
+      const actualPowerAmp = stPwr ? !!stPwr.getValue() : wantPowerAmp;
+      if (actualPowerAmp !== wantPowerAmp) {
+        rigMode = actualPowerAmp ? (prevRigMode === 'ampcab' ? 'ampcab' : 'amp') : 'cab';
+      } else {
+        rigMode = mode;
+      }
+      pendingTelePreferAmpCab = false;
+      if ($('powerAmpBtn')) $('powerAmpBtn').classList.toggle('on', actualPowerAmp);
+      applyRigModeDom(rigMode);
+      callNative('setRigViewMode', rigMode);
+      if (pwrChanged) markRigPresetDirty();
+    };
+    const rigSegEl = $('rigModeSeg');
+    if (rigSegEl) {
+      for (const b of rigSegEl.querySelectorAll('button')) {
+        b.addEventListener('click', () => switchRigMode(b.dataset.mode || 'cab'));
+      }
+    }
+    const bgSummaryBtn = $('bgRigSummaryBtn');
+    if (bgSummaryBtn) {
+      bgSummaryBtn.addEventListener('click', () => {
+        switchRigMode(rigMode === 'amp' ? 'ampcab' : 'amp');
+      });
+    }
+
+    // Expanded WD Load, Noise Gate & Overdrive Boost (#cardLoadGateBoost)
     bindToggle('loadBtn', 'loadEnabled', false);
     bindToggle('gateBtn', 'gateEnabled', false);
     bindSeg('reactiveSeg', 'reactiveMode', 1);
-    makeKnob('loadKnobs', { param: 'guitarVol',   label: 'Gtr Vol',  size: 34, min: 0, max: 10, def: 1.0, fmt: v => v.toFixed(1) });
-    makeKnob('loadKnobs', { param: 'guitarTone',  label: 'Gtr Tone', size: 34, min: 0, max: 10, def: 1.0, fmt: v => v.toFixed(1) });
-    makeKnob('loadKnobs', { param: 'cableLenM',   label: 'Cable',    size: 34, min: 0.5, max: 12, def: 2.5 / 11.5, fmt: v => v.toFixed(1) + 'm' });
-    makeKnob('loadKnobs', { param: 'gateThresh',  label: 'Gate Thr', size: 34, min: -80, max: -18, def: 28 / 62, fmt: v => Math.round(v) + 'dB' });
-    makeKnob('loadKnobs', { param: 'gateRelease', label: 'Gate Rel', size: 34, min: 25, max: 350, def: 40 / 325, fmt: v => Math.round(v) + 'ms' });
+    bindSeg('loadPickupSeg', 'loadPickupModel', 0);
+    bindSeg('loadWiringSeg', 'loadWiring', 0);
+    bindSeg('loadBleedSeg', 'loadBleedType', 0);
+    bindSeg('loadCableSeg', 'loadCablePreset', 0);
+    bindSelect('loadCouplingSel', 'loadCouplingProfile', 0);
+    makeKnob('loadKnobs', { param: 'guitarVol',          label: 'Gtr Vol',  size: 24, min: 0,   max: 10, def: 1.0,        color: '#6ec6ff', tip: 'Guitar Volume Pot Position (0..10)', fmt: v => v.toFixed(1) });
+    makeKnob('loadKnobs', { param: 'guitarTone',         label: 'Gtr Tone', size: 24, min: 0,   max: 10, def: 1.0,        color: '#6ec6ff', tip: 'Guitar Tone Pot Position (0..10)', fmt: v => v.toFixed(1) });
+    makeKnob('loadKnobs', { param: 'cableLenM',          label: 'Cable',    size: 24, min: 0.5, max: 12, def: 2.5 / 11.5, color: '#ffd166', tip: 'Instrument Cable Length (0.5..12.0 m)', fmt: v => v.toFixed(1) + ' m' });
+    makeKnob('loadKnobs', { param: 'loadDielectricLoss', label: 'Tan δ',    size: 24, min: 0,   max: 1,  def: 0.0,        color: '#ff7eb6', tip: 'Cable Dielectric Loss Tangent (tan δ)', fmt: fmtPct });
+    makeKnob('gateKnobs', { param: 'gateThresh',         label: 'Gate Thr', size: 24, min: -80, max: -18, def: 28 / 62,   color: '#6ec6ff', tip: 'Noise Gate Threshold (-80..-18 dB)', fmt: v => Math.round(v) + ' dB' });
+    makeKnob('gateKnobs', { param: 'gateRelease',        label: 'Gate Rel', size: 24, min: 25,  max: 350, def: 40 / 325,  color: '#6ec6ff', tip: 'Noise Gate Release (25..350 ms)', fmt: v => Math.round(v) + ' ms' });
 
     bindToggle('boostBtn', 'boostEnabled', false);
     bindSeg('boostTopoSeg', 'boostTopo', 0);
-    makeKnob('boostKnobs', { param: 'boostDrive', label: 'Drive', size: 34, min: 0, max: 1, def: 0.25, fmt: fmtPct });
-    makeKnob('boostKnobs', { param: 'boostTone',  label: 'Tone',  size: 34, min: 0, max: 1, def: 0.55, fmt: fmtPct });
-    makeKnob('boostKnobs', { param: 'boostLevel', label: 'Level', size: 34, min: 0, max: 1, def: 0.75, fmt: fmtPct });
+    makeKnob('boostKnobs', { param: 'boostDrive', label: 'Drive', size: 24, min: 0, max: 1, def: 0.25, color: '#ffd166', tip: 'Overdrive Diode Clipping Gain (0..100%)', fmt: fmtPct });
+    makeKnob('boostKnobs', { param: 'boostTone',  label: 'Tone',  size: 24, min: 0, max: 1, def: 0.55, color: '#ffd166', tip: 'Overdrive Post-Clip Tone Tilt (0..100%)', fmt: fmtPct });
+    makeKnob('boostKnobs', { param: 'boostLevel', label: 'Level', size: 24, min: 0, max: 1, def: 0.75, color: '#ff7eb6', tip: 'Overdrive Output Boost Level (0..100%)', fmt: fmtPct });
 
+    // Tube Preamp & Tone Stack (#cardPreamp)
     bindToggle('preampBtn', 'preampEnabled', false);
     bindSeg('channelSeg', 'channel', 1);
-    makeKnob('preampKnobs', { param: 'preampGain', label: 'Gain',     size: 34, min: 0, max: 1, def: 0.55, fmt: fmtPct });
-    makeKnob('preampKnobs', { param: 'bass',       label: 'Bass',     size: 34, min: 0, max: 1, def: 0.50, fmt: fmtPct });
-    makeKnob('preampKnobs', { param: 'mid',        label: 'Middle',   size: 34, min: 0, max: 1, def: 0.50, fmt: fmtPct });
-    makeKnob('preampKnobs', { param: 'treble',     label: 'Treble',   size: 34, min: 0, max: 1, def: 0.55, fmt: fmtPct });
-    makeKnob('preampKnobs', { param: 'preampBias', label: 'V1 Bias',  size: 34, min: -1.5, max: 1.0, def: 0.60, fmt: fmtV });
-    makeKnob('preampKnobs', { param: 'preampAge',  label: 'Tube Age', size: 34, min: 0, max: 1, def: 0.15, fmt: fmtPct });
+    makeKnob('preampKnobs', { param: 'preampGain', label: 'Gain',     size: 34, min: 0,    max: 1,   def: 0.55, color: '#ff7eb6', tip: 'Preamp Cascaded Triode Input Gain (0..100%)', fmt: fmtPct });
+    makeKnob('preampKnobs', { param: 'bass',       label: 'Bass',     size: 34, min: 0,    max: 1,   def: 0.50, color: '#6ec6ff', tip: 'Passive Tube Tone Stack Bass (0..100%)', fmt: fmtPct });
+    makeKnob('preampKnobs', { param: 'mid',        label: 'Middle',   size: 34, min: 0,    max: 1,   def: 0.50, color: '#ffd166', tip: 'Passive Tube Tone Stack Midrange (0..100%)', fmt: fmtPct });
+    makeKnob('preampKnobs', { param: 'treble',     label: 'Treble',   size: 34, min: 0,    max: 1,   def: 0.55, color: '#ff7eb6', tip: 'Passive Tube Tone Stack Treble (0..100%)', fmt: fmtPct });
+    makeKnob('preampKnobs', { param: 'preampBias', label: 'V1 Bias',  size: 34, min: -1.5, max: 1.0, def: 0.60, color: '#ff6b6b', tip: 'V1 Triode Grid Bias Offset (-1.5..+1.0 V)', fmt: fmtV });
+    makeKnob('preampKnobs', { param: 'preampAge',  label: 'Tube Age', size: 34, min: 0,    max: 1,   def: 0.15, color: '#6ec6ff', tip: 'Preamp Tube Cathode Wear & Asymmetry (0..100%)', fmt: fmtPct });
 
-    bindToggle('powerAmpBtn', 'powerAmpEnabled', false);
+    // Studio FX Loop & Calibration (#cardFxLoop)
+    bindToggle('fxLoopBtn', 'fxLoopEnabled', false);
+    bindSeg('fxLoopModeSeg', 'fxLoopMode', 0);
+    makeKnob('fxLoopKnobs', { param: 'fxLoopTime',     label: 'Time / Size',  size: 32, min: 0,   max: 1,  def: 0.45,  color: '#ffd166', tip: 'FX Loop Time / Spring Tank Size', fmt: fmtPct });
+    makeKnob('fxLoopKnobs', { param: 'fxLoopFeedback', label: 'Dwell / Fdbk', size: 32, min: 0,   max: 1,  def: 0.35,  color: '#ff7eb6', tip: 'FX Loop Dwell / Regeneration Feedback', fmt: fmtPct });
+    makeKnob('fxLoopKnobs', { param: 'fxLoopMix',      label: 'FX Mix',       size: 32, min: 0,   max: 1,  def: 0.22,  color: '#6ec6ff', tip: 'FX Loop Dry/Wet Mix', fmt: fmtPct });
+    makeKnob('fxLoopKnobs', { param: 'inputCal',       label: 'Input Cal',    size: 32, min: -18, max: 18, def: 0.50,  color: '#6ec6ff', tip: 'Deterministic Input Level Calibration (-18..+18 dB)', fmt: fmtDb });
+    makeKnob('fxLoopKnobs', { param: 'outputDb',       label: 'Output',       size: 32, min: -36, max: 18, def: 2 / 3, color: '#ffd166', tip: 'Master Stereo Output Trim (-36..+18 dB)', fmt: fmtDb });
+
+    // Full Tube Power Amp & OT Iron (#cardFullPower)
+    const mirrorTubeSegInStandalone = (targetId, idx) => {
+      if (comboState('powerTube')) return;
+      const sib = $(targetId);
+      if (sib) [...sib.querySelectorAll('button')].forEach((b, j) => {
+        const isOn = j === idx;
+        b.classList.toggle('on', isOn);
+        if (typeof b.setAttribute === 'function') b.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+      });
+    };
+    bindToggle('powerAmpBtn', 'powerAmpEnabled', false, v => syncRigModeFromPowerAmp(v));
+    if (telem && typeof telem.preferAmpCab === 'boolean' && syncRigModeFromTelemetryFn) {
+      syncRigModeFromTelemetryFn(telem);
+    }
+    bindSeg('ampPowerTubeSeg', 'powerTube', 0, idx => mirrorTubeSegInStandalone('powerTubeSeg', idx));
     bindSeg('rectifierSeg', 'rectifier', 0);
-    makeKnob('powerKnobs', { param: 'powerBias',   label: 'Pwr Bias', size: 34, min: -56, max: -30, def: 0.50, fmt: v => Math.round(v) + 'V' });
-    makeKnob('powerKnobs', { param: 'powerAge',    label: 'Pair Age', size: 34, min: 0, max: 1, def: 0.18, fmt: fmtPct });
-    makeKnob('powerKnobs', { param: 'xfmrDrive',   label: 'OT Iron',  size: 34, min: 0, max: 1, def: 0.50, fmt: fmtPct });
+    makeKnob('powerKnobs', { param: 'masterVol',   label: 'Master Dyn', size: 28, min: 0,    max: 1,    def: 0.55,     color: '#ff7eb6', tip: 'Power Stage / Speaker Motor Dynamic Drive (0..100%)', fmt: fmtPct });
+    makeKnob('powerKnobs', { param: 'presence',    label: 'Presence',   size: 28, min: 0,    max: 1,    def: 0.50,     color: '#ffd166', tip: 'High-Frequency NFB Damping Release (0..100%)', fmt: fmtPct });
+    makeKnob('powerKnobs', { param: 'depth',       label: 'Depth',      size: 28, min: 0,    max: 1,    def: 0.50,     color: '#ff7eb6', tip: 'Low-Frequency Resonance NFB Release (0..100%)', fmt: fmtPct });
+    makeKnob('powerKnobs', { param: 'nfbAmount',   label: 'NFB Damp',   size: 28, min: 0,    max: 1,    def: 0.55,     color: '#6ec6ff', tip: 'Power Amp Negative Feedback Damping Factor (0..100%)', fmt: fmtPct });
+    makeKnob('powerKnobs', { param: 'powerScaleW', label: 'Power (W)',  size: 28, min: 5,    max: 120,  def: 45 / 115, color: '#ff6b6b', tip: 'Power Amp / Motor Wattage Headroom (5..120 W)', fmt: v => Math.round(v) + ' W' });
+    makeKnob('powerKnobs', { param: 'impRatio',    label: 'Impedance',  size: 28, min: 0.50, max: 2.00, def: 1 / 3,    color: '#ffd166', tip: 'Speaker Load Matching (0.5x 4Ω Lo-Z .. 1.0x 8Ω Match .. 2.0x 16Ω Hi-Z)', fmt: fmtImp });
+    makeKnob('powerKnobs', { param: 'powerBias',   label: 'Pwr Bias',   size: 28, min: -56,  max: -30,  def: 0.50,     color: '#ff6b6b', tip: 'Output Tube Negative Grid Bias (-56..-30 V)', fmt: v => Math.round(v) + ' V' });
+    makeKnob('powerKnobs', { param: 'powerAge',    label: 'Pair Age',   size: 28, min: 0,    max: 1,    def: 0.18,     color: '#6ec6ff', tip: 'Matched Power Tube Pair Aging & Crossover Drift (0..100%)', fmt: fmtPct });
+    makeKnob('powerKnobs', { param: 'xfmrDrive',   label: 'OT Iron',    size: 28, min: 0,    max: 1,    def: 0.50,     color: '#ffd166', tip: 'Output Transformer Core Flux Saturation (0..100%)', fmt: fmtPct });
 
     // Cabinet A & Mic A (Bocchi Pink primary accent)
     stageA = null;
-    bindToggle('cabBtn', 'cabEnabled', true);
+    bindToggle('cabBtn', 'cabEnabled', true, () => { if (!window.__wdUiBootPending) drawScope(); });
     bindToggle('micBtn', 'micEnabled', true);
     bindToggle('micPhaseBtn', 'micPhase', false, v => stageA && stageA.setPhase(v));
     bindSeg('cabModelSeg', 'cabModel', 2, i => stageA && stageA.setCabIdx(i));
     bindSeg('micModelSeg', 'micModel', 0, i => stageA && stageA.setMicIdx(i));
     bindSeg('micPreModelSeg', 'micPreModel', 1, i => stageA && stageA.setPreIdx(i));
+    bindSeg('cabACutOrderSeg', 'cabACutOrder', 0);
+    const cabADeltaEl = $('cabADeltaBtn');
+    if (cabADeltaEl) {
+      cabADeltaEl.addEventListener('click', () => {
+        const next = !cabADeltaOn;
+        cabADeltaOn = next;
+        syncCabDeltaFromTelemetry({ cabADelta: next });
+        callNative('setCabDelta', 0, next);
+      });
+    }
 
-    makeKnob('cabAKnobsBot', { param: 'micOffAxis',  label: 'Angle',     size: 34, min: 0,    max: 45,    def: 12 / 45, color: '#6ec6ff', tip: 'Microphone Off-Axis Angle (0° straight on to 45° angled)', fmt: v => Math.round(v) + '°', onChange: () => stageA && stageA.syncFromState() });
-    makeKnob('cabAKnobsBot', { param: 'micDrive',    label: 'Mic SPL',   size: 34, min: -12,  max: 24,    def: 1 / 3,  color: '#ff6b6b', tip: 'Acoustic SPL at Microphone Capsule & Internal Transformer (-12 to +24 dB, loudness-compensated) — combines with 3D Mic Placement to govern capsule & mic iron saturation', fmt: fmtDb, onChange: () => stageA && stageA.syncFromState() });
-    makeKnob('cabAKnobsBot', { param: 'micPreDrive', label: 'Pre Drive', size: 34, min: -12,  max: 24,    def: 1 / 3,  color: '#ffd166', tip: 'Analog Suite Mic Preamp Input Drive (-12 to +24 dB, loudness-compensated) — drives the selected preamp (Clean / 73 / 12 / 76 / REDD / Porta) independently of Mic SPL', fmt: fmtDb });
-    makeKnob('cabAKnobsBot', { param: 'cabAPan',     label: 'Pan',       size: 34, min: -1.0, max: 1.0,   def: 0.375,  color: '#ff7eb6', tip: 'Cab A Stereo Pan', fmt: fmtPan });
-    makeKnob('cabAKnobsBot', { param: 'cabALevelDb', label: 'Level',     size: 34, min: -24,  max: 12,    def: 2 / 3,  color: '#ff7eb6', tip: 'Cab A Output Level', fmt: fmtDb });
+    makeKnob('cabAKnobsBot', { param: 'micOffAxis',  label: 'Angle',     size: 28, min: 0,    max: 45,    def: 12 / 45, color: '#6ec6ff', tip: 'Microphone Off-Axis Angle (0° straight on to 45° angled)', fmt: v => Math.round(v) + '°', onChange: () => stageA && stageA.syncFromState() });
+    makeKnob('cabAKnobsBot', { param: 'micDrive',    label: 'Mic SPL',   size: 28, min: -12,  max: 24,    def: 1 / 3,  color: '#ff6b6b', tip: 'Acoustic SPL at Microphone Capsule & Internal Transformer (-12 to +24 dB, loudness-compensated) — combines with 3D Mic Placement to govern capsule & mic iron saturation', fmt: fmtDb, onChange: () => stageA && stageA.syncFromState() });
+    makeKnob('cabAKnobsBot', { param: 'micPreDrive', label: 'Pre Drive', size: 28, min: -12,  max: 24,    def: 1 / 3,  color: '#ffd166', tip: 'Analog Suite Mic Preamp Input Drive (-12 to +24 dB, loudness-compensated, calibrated @ -12 dBFS / 240 Hz) — drives the selected preamp (Clean / 73 / 12 / 76 / REDD / Porta) independently of Mic SPL', fmt: fmtDb });
+    makeKnob('cabAKnobsBot', { param: 'cabAPan',     label: 'Pan',       size: 28, min: -1.0, max: 1.0,   def: 0.375,  color: '#ff7eb6', tip: 'Cab A Stereo Pan', fmt: fmtPan });
+    makeKnob('cabAKnobsBot', { param: 'cabALevelDb', label: 'Level',     size: 28, min: -24,  max: 12,    def: 2 / 3,  color: '#ff7eb6', tip: 'Cab A Output Level', fmt: fmtDb });
 
-    makeKnob('cabAKnobsTop', { param: 'cabALoResDb', label: 'Lo Res',   size: 32, min: -6.0, max: 6.0,   def: 0.50,   color: '#ffd166', tip: 'Speaker Low Resonance (-6 to +6 dB)', fmt: fmtDb });
-    makeKnob('cabAKnobsTop', { param: 'cabAHiResDb', label: 'Hi Res',   size: 32, min: -6.0, max: 6.0,   def: 0.50,   color: '#ffd166', tip: 'Speaker Cone Breakup Resonance (-6 to +6 dB)', fmt: fmtDb });
-    makeKnob('cabAKnobsTop', { param: 'cabBoxScale', label: 'Box Tune', size: 32, min: 0.85, max: 1.15,  def: 0.50,   color: '#6ec6ff', fmt: v => Math.round(v * 100) + '%' });
-    makeKnob('cabAKnobsTop', { param: 'cabConeDamp', label: 'Cone Q',   size: 32, min: 0.70, max: 1.40,  def: 3 / 7,  color: '#6ec6ff', fmt: v => v.toFixed(2) });
-    makeKnob('cabAKnobsTop', { param: 'cabAHpfHz',   label: 'Low Cut',  size: 32, min: 20,   max: 400,   def: 0.0,    color: '#6ec6ff', fmt: fmtHpf });
-    makeKnob('cabAKnobsTop', { param: 'cabALpfHz',   label: 'High Cut', size: 32, min: 2000, max: 20000, def: 1.0,    color: '#6ec6ff', fmt: fmtLpf });
+    makeKnob('cabAKnobsTop', { param: 'cabALoResDb', label: 'Lo Res',   size: 28, min: -6.0, max: 6.0,   def: 0.50,   color: '#ffd166', tip: 'Speaker Low Resonance (-6 to +6 dB)', fmt: fmtDb });
+    makeKnob('cabAKnobsTop', { param: 'cabAHiResDb', label: 'Hi Res',   size: 28, min: -6.0, max: 6.0,   def: 0.50,   color: '#ffd166', tip: 'Speaker Cone Breakup Resonance (-6 to +6 dB)', fmt: fmtDb });
+    makeKnob('cabAKnobsTop', { param: 'cabBoxScale', label: 'Box Tune', size: 28, min: 0.85, max: 1.15,  def: 0.50,   color: '#6ec6ff', tip: 'Cabinet Enclosure Resonance Tuning Scale (85%..115%)', fmt: v => Math.round(v * 100) + '%' });
+    makeKnob('cabAKnobsTop', { param: 'cabConeDamp', label: 'Cone Q',   size: 28, min: 0.70, max: 1.40,  def: 3 / 7,  color: '#6ec6ff', tip: 'Speaker Cone Suspension Damping Factor Q (0.70..1.40)', fmt: v => v.toFixed(2) });
+    makeKnob('cabAKnobsTop', { param: 'cabAHpfHz',   label: 'Low Cut',  size: 28, min: 20,   max: 400,   def: 0.0,    color: '#6ec6ff', tip: 'Cab A High-Pass Low-Cut Filter (20..400 Hz)', fmt: fmtHpf });
+    makeKnob('cabAKnobsTop', { param: 'cabALpfHz',   label: 'High Cut', size: 28, min: 2000, max: 20000, def: 1.0,    color: '#6ec6ff', tip: 'Cab A Low-Pass High-Cut Filter (2.0..20.0 kHz)', fmt: fmtLpf });
 
     stageA = makeMicStage('micStageA', {
       coneParam: 'micConePos', distParam: 'micDistCm', angleParam: 'micOffAxis', driveParam: 'micDrive',
@@ -2038,25 +3461,36 @@
 
     // Cabinet B & Mic B (Nijika Sunny Yellow primary accent)
     stageB = null;
-    bindToggle('cabBBtn', 'cabBEnabled', true);
+    bindToggle('cabBBtn', 'cabBEnabled', true, () => { if (!window.__wdUiBootPending) drawScope(); });
     bindToggle('micBBtn', 'micBEnabled', true);
     bindToggle('micBPhaseBtn', 'micBPhase', false, v => stageB && stageB.setPhase(v));
     bindSeg('cabBModelSeg', 'cabBModel', 1, i => stageB && stageB.setCabIdx(i));
     bindSeg('micBModelSeg', 'micBModel', 1, i => stageB && stageB.setMicIdx(i));
     bindSeg('micBPreModelSeg', 'micBPreModel', 2, i => stageB && stageB.setPreIdx(i));
+    bindSeg('cabBCutOrderSeg', 'cabBCutOrder', 0);
+    const cabBDeltaEl = $('cabBDeltaBtn');
+    if (cabBDeltaEl) {
+      cabBDeltaEl.addEventListener('click', () => {
+        const next = !cabBDeltaOn;
+        cabBDeltaOn = next;
+        syncCabDeltaFromTelemetry({ cabBDelta: next });
+        callNative('setCabDelta', 1, next);
+      });
+    }
 
-    makeKnob('cabBKnobsBot', { param: 'micBOffAxis',  label: 'Angle',     size: 34, min: 0,    max: 45,    def: 10 / 45, color: '#6ec6ff', tip: 'Microphone Off-Axis Angle (0° straight on to 45° angled)', fmt: v => Math.round(v) + '°', onChange: () => stageB && stageB.syncFromState() });
-    makeKnob('cabBKnobsBot', { param: 'micBDrive',    label: 'Mic SPL',   size: 34, min: -12,  max: 24,    def: 1 / 3,   color: '#ff6b6b', tip: 'Acoustic SPL at Microphone Capsule & Internal Transformer (-12 to +24 dB, loudness-compensated) — combines with 3D Mic Placement to govern capsule, ribbon & mic iron saturation', fmt: fmtDb, onChange: () => stageB && stageB.syncFromState() });
-    makeKnob('cabBKnobsBot', { param: 'micBPreDrive', label: 'Pre Drive', size: 34, min: -12,  max: 24,    def: 1 / 3,   color: '#ffd166', tip: 'Analog Suite Mic Preamp Input Drive (-12 to +24 dB, loudness-compensated) — drives the selected preamp (Clean / 73 / 12 / 76 / REDD / Porta) independently of Mic SPL', fmt: fmtDb });
-    makeKnob('cabBKnobsBot', { param: 'cabBPan',      label: 'Pan',       size: 34, min: -1.0, max: 1.0,   def: 0.625,   color: '#ffd166', tip: 'Cab B Stereo Pan', fmt: fmtPan });
-    makeKnob('cabBKnobsBot', { param: 'cabBLevelDb',  label: 'Level',     size: 34, min: -24,  max: 12,    def: 2 / 3,   color: '#ffd166', tip: 'Cab B Output Level', fmt: fmtDb });
+    makeKnob('cabBKnobsBot', { param: 'micBOffAxis',  label: 'Angle',     size: 28, min: 0,    max: 45,    def: 10 / 45, color: '#6ec6ff', tip: 'Microphone Off-Axis Angle (0° straight on to 45° angled)', fmt: v => Math.round(v) + '°', onChange: () => stageB && stageB.syncFromState() });
+    makeKnob('cabBKnobsBot', { param: 'micBDrive',    label: 'Mic SPL',   size: 28, min: -12,  max: 24,    def: 1 / 3,   color: '#ff6b6b', tip: 'Acoustic SPL at Microphone Capsule & Internal Transformer (-12 to +24 dB, loudness-compensated) — combines with 3D Mic Placement to govern capsule, ribbon & mic iron saturation', fmt: fmtDb, onChange: () => stageB && stageB.syncFromState() });
+    makeKnob('cabBKnobsBot', { param: 'micBPreDrive', label: 'Pre Drive', size: 28, min: -12,  max: 24,    def: 1 / 3,   color: '#ffd166', tip: 'Analog Suite Mic Preamp Input Drive (-12 to +24 dB, loudness-compensated, calibrated @ -12 dBFS / 240 Hz) — drives the selected preamp (Clean / 73 / 12 / 76 / REDD / Porta) independently of Mic SPL', fmt: fmtDb });
+    makeKnob('cabBKnobsBot', { param: 'cabBPan',      label: 'Pan',       size: 28, min: -1.0, max: 1.0,   def: 0.625,   color: '#ffd166', tip: 'Cab B Stereo Pan', fmt: fmtPan });
+    makeKnob('cabBKnobsBot', { param: 'cabBLevelDb',  label: 'Level',     size: 28, min: -24,  max: 12,    def: 2 / 3,   color: '#ffd166', tip: 'Cab B Output Level', fmt: fmtDb });
+    makeKnob('cabBKnobsBot', { param: 'cabBDelayMs',  label: 'Delay',     size: 28, min: 0.0,  max: 10.0,  def: 0.0,     skew: 0.55, color: '#ffd166', tip: 'Cab B Micro-Delay (0.00..10.00 ms) — phase alignment & dual-cab comb-filter sculpting', fmt: fmtDly });
 
-    makeKnob('cabBKnobsTop', { param: 'cabBLoResDb', label: 'Lo Res',   size: 32, min: -6.0, max: 6.0,   def: 0.50,   color: '#ffd166', tip: 'Speaker Low Resonance (-6 to +6 dB)', fmt: fmtDb });
-    makeKnob('cabBKnobsTop', { param: 'cabBHiResDb', label: 'Hi Res',   size: 32, min: -6.0, max: 6.0,   def: 0.50,   color: '#ffd166', tip: 'Speaker Cone Breakup Resonance (-6 to +6 dB)', fmt: fmtDb });
-    makeKnob('cabBKnobsTop', { param: 'cabBBoxScale',label: 'Box Tune', size: 32, min: 0.85, max: 1.15,  def: 0.50,   color: '#6ec6ff', fmt: v => Math.round(v * 100) + '%' });
-    makeKnob('cabBKnobsTop', { param: 'cabBConeDamp',label: 'Cone Q',   size: 32, min: 0.70, max: 1.40,  def: 3 / 7,  color: '#6ec6ff', fmt: v => v.toFixed(2) });
-    makeKnob('cabBKnobsTop', { param: 'cabBHpfHz',   label: 'Low Cut',  size: 32, min: 20,   max: 400,   def: 0.0,    color: '#6ec6ff', fmt: fmtHpf });
-    makeKnob('cabBKnobsTop', { param: 'cabBLpfHz',   label: 'High Cut', size: 32, min: 2000, max: 20000, def: 1.0,    color: '#6ec6ff', fmt: fmtLpf });
+    makeKnob('cabBKnobsTop', { param: 'cabBLoResDb', label: 'Lo Res',   size: 28, min: -6.0, max: 6.0,   def: 0.50,   color: '#ffd166', tip: 'Speaker Low Resonance (-6 to +6 dB)', fmt: fmtDb });
+    makeKnob('cabBKnobsTop', { param: 'cabBHiResDb', label: 'Hi Res',   size: 28, min: -6.0, max: 6.0,   def: 0.50,   color: '#ffd166', tip: 'Speaker Cone Breakup Resonance (-6 to +6 dB)', fmt: fmtDb });
+    makeKnob('cabBKnobsTop', { param: 'cabBBoxScale',label: 'Box Tune', size: 28, min: 0.85, max: 1.15,  def: 0.50,   color: '#6ec6ff', tip: 'Cabinet Enclosure Resonance Tuning Scale (85%..115%)', fmt: v => Math.round(v * 100) + '%' });
+    makeKnob('cabBKnobsTop', { param: 'cabBConeDamp',label: 'Cone Q',   size: 28, min: 0.70, max: 1.40,  def: 3 / 7,  color: '#6ec6ff', tip: 'Speaker Cone Suspension Damping Factor Q (0.70..1.40)', fmt: v => v.toFixed(2) });
+    makeKnob('cabBKnobsTop', { param: 'cabBHpfHz',   label: 'Low Cut',  size: 28, min: 20,   max: 400,   def: 0.0,    color: '#6ec6ff', tip: 'Cab B High-Pass Low-Cut Filter (20..400 Hz)', fmt: fmtHpf });
+    makeKnob('cabBKnobsTop', { param: 'cabBLpfHz',   label: 'High Cut', size: 28, min: 2000, max: 20000, def: 1.0,    color: '#6ec6ff', tip: 'Cab B Low-Pass High-Cut Filter (2.0..20.0 kHz)', fmt: fmtLpf });
 
     stageB = makeMicStage('micStageB', {
       coneParam: 'micBConePos', distParam: 'micBDistCm', angleParam: 'micBOffAxis', driveParam: 'micBDrive',
@@ -2066,29 +3500,33 @@
     });
 
     // Amp Coupling & Speaker Motor
-    bindSeg('powerTubeSeg', 'powerTube', 0);
-    makeKnob('motorKnobs', { param: 'inputCal',    label: 'Input Cal', size: 36, min: -18,  max: 18,   def: 0.50,     color: '#6ec6ff', tip: 'Deterministic Input Level Calibration (-18 to +18 dB, 0 dB = -12 dBFS nominal reference into speaker motor & mic capsules)', fmt: fmtDb });
-    makeKnob('motorKnobs', { param: 'masterVol',   label: 'Dynamics',  size: 36, min: 0,    max: 1,    def: 0.55,     color: '#ff7eb6', tip: 'Speaker Motor Dynamic Drive — shapes how hard the speaker cone & resonances react dynamically (volume-independent)', fmt: fmtPct });
-    makeKnob('motorKnobs', { param: 'impRatio',    label: 'Impedance', size: 36, min: 0.50, max: 2.00, def: 1 / 3,    color: '#ffd166', tip: 'Speaker Load Matching (0.5x 4Ω Lo-Z .. 1.0x 8Ω Match .. 2.0x 16Ω Hi-Z)', fmt: fmtImp });
-    makeKnob('motorKnobs', { param: 'powerScaleW', label: 'Headroom',  size: 36, min: 5,    max: 120,  def: 45 / 115, color: '#ff6b6b', tip: 'Speaker Motor Wattage Headroom (5W..120W)', fmt: v => Math.round(v) + 'W' });
-    makeKnob('motorKnobs', { param: 'depth',       label: 'Depth',     size: 36, min: 0,    max: 1,    def: 0.50,     color: '#ff7eb6', tip: 'Low-Frequency Resonance Feedback Release', fmt: fmtPct });
-    makeKnob('motorKnobs', { param: 'presence',    label: 'Presence',  size: 36, min: 0,    max: 1,    def: 0.50,     color: '#ffd166', tip: 'High-Frequency Damping Release', fmt: fmtPct });
-    makeKnob('motorKnobs', { param: 'nfbAmount',   label: 'Damping',   size: 36, min: 0,    max: 1,    def: 0.55,     color: '#6ec6ff', tip: 'Power Amp Negative Feedback Damping Factor', fmt: fmtPct });
+    bindSeg('powerTubeSeg', 'powerTube', 0, idx => mirrorTubeSegInStandalone('ampPowerTubeSeg', idx));
+    makeKnob('motorKnobs', { param: 'inputCal',    label: 'Input Cal',  size: 34, min: -18,  max: 18,   def: 0.50,     color: '#6ec6ff', tip: 'Deterministic Input Level Calibration (-18 to +18 dB, 0 dB = -12 dBFS nominal reference into speaker motor & mic capsules)', fmt: fmtDb });
+    makeKnob('motorKnobs', { param: 'masterVol',   label: 'Master Dyn', size: 34, min: 0,    max: 1,    def: 0.55,     color: '#ff7eb6', tip: 'Power Stage / Speaker Motor Dynamic Drive — shapes how hard the speaker cone & resonances react dynamically (volume-independent)', fmt: fmtPct });
+    makeKnob('motorKnobs', { param: 'impRatio',    label: 'Impedance',  size: 34, min: 0.50, max: 2.00, def: 1 / 3,    color: '#ffd166', tip: 'Speaker Load Matching (0.5x 4Ω Lo-Z .. 1.0x 8Ω Match .. 2.0x 16Ω Hi-Z)', fmt: fmtImp });
+    makeKnob('motorKnobs', { param: 'powerScaleW', label: 'Power (W)',  size: 34, min: 5,    max: 120,  def: 45 / 115, color: '#ff6b6b', tip: 'Power Amp / Speaker Motor Wattage Headroom (5..120 W)', fmt: v => Math.round(v) + ' W' });
+    makeKnob('motorKnobs', { param: 'depth',       label: 'Depth',      size: 34, min: 0,    max: 1,    def: 0.50,     color: '#ff7eb6', tip: 'Low-Frequency Resonance Feedback Release', fmt: fmtPct });
+    makeKnob('motorKnobs', { param: 'presence',    label: 'Presence',   size: 34, min: 0,    max: 1,    def: 0.50,     color: '#ffd166', tip: 'High-Frequency Damping Release', fmt: fmtPct });
+    makeKnob('motorKnobs', { param: 'nfbAmount',   label: 'NFB Damp',   size: 34, min: 0,    max: 1,    def: 0.55,     color: '#6ec6ff', tip: 'Power Amp Negative Feedback Damping Factor', fmt: fmtPct });
 
     // Studio Room & Master Output
     bindToggle('roomBtn', 'roomEnabled', true);
     bindSeg('roomTypeSeg', 'roomType', 1);
     bindSeg('roomPanSeg',  'roomPanMode', 0);
 
-    makeKnob('roomKnobsAll', { param: 'roomSize',  label: 'Room Size', size: 34, min: 0.60, max: 1.50, def: 4 / 9,  color: '#6ec6ff', fmt: v => Math.round(v * 100) + '%' });
-    makeKnob('roomKnobsAll', { param: 'roomDistM', label: 'Distance',  size: 34, min: 0.40, max: 6.00, def: 9 / 28, color: '#ff6b6b', fmt: v => v.toFixed(1) + 'm' });
-    makeKnob('roomKnobsAll', { param: 'roomDamp',  label: 'Absorption',size: 34, min: 0.0,  max: 1.0,  def: 0.45,   color: '#6ec6ff', fmt: fmtPct });
-    makeKnob('roomKnobsAll', { param: 'roomWidth', label: 'Stereo',    size: 34, min: 0.0,  max: 1.0,  def: 0.80,   color: '#ff7eb6', fmt: fmtPct });
-    makeKnob('roomKnobsAll', { param: 'roomSmash', label: 'Smash',     size: 34, min: 0.0,  max: 1.0,  def: 0.0,    color: '#ff7eb6', tip: 'Baby WD Duress Stereo Room Smash (0% Bypassed .. 100% Aggressive Room Squash & Harmonics)', fmt: fmtPct });
-    makeKnob('roomKnobsAll', { param: 'roomLevel', label: 'Room Mix',  size: 34, min: 0.0,  max: 1.0,  def: 0.28,   color: '#ff6b6b', tip: 'Dry/Wet Room Mix (0% Close Mics Only .. 100% Studio Room Only)', fmt: fmtPct });
-    makeKnob('roomKnobsAll', { param: 'outputDb',  label: 'Output',    size: 34, min: -36,  max: 18,   def: 2 / 3,  color: '#ffd166', fmt: fmtDb });
+    makeKnob('roomKnobsAll', { param: 'roomSize',       label: 'Room Size', size: 28, min: 0.60, max: 1.50,  def: 4 / 9,  color: '#6ec6ff', tip: 'Studio Room Dimensions Scale (60%..150%)', fmt: v => Math.round(v * 100) + '%' });
+    makeKnob('roomKnobsAll', { param: 'roomDistM',      label: 'Distance',  size: 28, min: 0.40, max: 6.00,  def: 9 / 28, color: '#ff6b6b', tip: 'Stereo Room Mic Distance from Cabinets (0.4..6.0 m)', fmt: v => v.toFixed(1) + ' m' });
+    makeKnob('roomKnobsAll', { param: 'roomDamp',       label: 'Absorb',    size: 28, min: 0.0,  max: 1.0,   def: 0.45,   color: '#6ec6ff', tip: 'Wall Acoustic High-Frequency Absorption (0..100%)', fmt: fmtPct });
+    makeKnob('roomKnobsAll', { param: 'roomWidth',      label: 'Stereo',    size: 28, min: 0.0,  max: 1.0,   def: 0.80,   color: '#ff7eb6', tip: 'Stereo Room Mic Width (0% Mono .. 100% Wide)', fmt: fmtPct });
+    makeKnob('roomKnobsAll', { param: 'roomPreDelayMs', label: 'Pre-Dly',   size: 28, min: 0.0,  max: 100.0, def: 0.0,    skew: 0.65, color: '#6ec6ff', tip: 'Studio Room Pre-Delay (0..100 ms)', fmt: fmtPreDly });
+    makeKnob('roomKnobsAll', { param: 'roomLoCutHz',    label: 'Lo Cut',    size: 28, min: 20,   max: 600,   def: 0.0,    skew: 0.42, color: '#6ec6ff', tip: 'Studio Room Wet Low Cut (20..600 Hz, 2nd-order Butterworth)', fmt: fmtHpf });
+    makeKnob('roomKnobsAll', { param: 'roomHiCutHz',    label: 'Hi Cut',    size: 28, min: 1500, max: 20000, def: 1.0,    skew: 0.42, color: '#6ec6ff', tip: 'Studio Room Wet High Cut (1.5..20.0 kHz, 2nd-order Butterworth)', fmt: fmtLpf });
+    makeKnob('roomKnobsAll', { param: 'roomSmash',      label: 'Smash',     size: 28, min: 0.0,  max: 1.0,   def: 0.0,    color: '#ff7eb6', tip: 'Baby WD Duress Stereo Room Smash (0% Bypassed .. 100% Aggressive Room Squash & Harmonics)', fmt: fmtPct });
+    makeKnob('roomKnobsAll', { param: 'roomLevel',      label: 'Room Mix',  size: 28, min: 0.0,  max: 1.0,   def: 0.28,   color: '#ff6b6b', tip: 'Dry/Wet Room Mix (0% Close Mics Only .. 100% Studio Room Only)', fmt: fmtPct });
+    makeKnob('roomKnobsAll', { param: 'outputDb',       label: 'Output',    size: 28, min: -36,  max: 18,    def: 2 / 3,  color: '#ffd166', tip: 'Master Stereo Output Trim (-36..+18 dB)', fmt: fmtDb });
 
     bindToggle('powerBtn', 'power', true);
+    if (updateRigDerivedUiFn) updateRigDerivedUiFn();
 
     // Per-Cab User .wav IR Loader (Browse Button, Clear Button, Drag-and-Drop)
     const callNative = (fnName, ...args) => {
@@ -2105,40 +3543,57 @@
       const loadBtn   = $(loadBtnId);
       const clearBtn  = $(clearBtnId);
       const card      = $(cardId);
-      const idleLabel = (loadBtn && loadBtn.textContent) || 'IR';
-      let errTimer    = null;
+      const cabTag    = slot === 0 ? 'Cab A' : 'Cab B';
+      const errSource = 'ir' + slot;
+      let pending     = false;
       const clearIrError = () => {
-        if (errTimer) {
-          clearTimeout(errTimer);
-          errTimer = null;
-        }
         if (loadBtn && loadBtn.classList && loadBtn.classList.contains('ir-error')) {
           loadBtn.classList.remove('ir-error');
-          loadBtn.textContent = idleLabel;
         }
+        if (typeof clearUiError === 'function') clearUiError(errSource);
       };
-      const flashIrError = () => {
-        if (!loadBtn || !loadBtn.classList) return;
-        loadBtn.classList.add('ir-error');
-        loadBtn.textContent = 'IR ERR';
-        if (errTimer) clearTimeout(errTimer);
-        errTimer = setTimeout(() => {
-          loadBtn.classList.remove('ir-error');
-          loadBtn.textContent = idleLabel;
-          errTimer = null;
-        }, 2200);
+      const flashIrError = detail => {
+        if (loadBtn && loadBtn.classList) loadBtn.classList.add('ir-error');
+        if (typeof showUiError === 'function') {
+          showUiError(detail || (cabTag + ' User IR load failed — requires valid PCM .wav (44 B–16 MiB).'), errSource);
+        }
       };
       const handleLoadOutcome = ok => {
         if (ok === false) flashIrError();
         else if (ok === true) clearIrError();
       };
-      if (loadBtn)  loadBtn.addEventListener('click', () => Promise.resolve(callNative('loadUserIr', slot)).then(handleLoadOutcome));
-      if (clearBtn) clearBtn.addEventListener('click', () => { clearIrError(); callNative('clearUserIr', slot); });
+      if (loadBtn) {
+        loadBtn.addEventListener('click', async () => {
+          if (pending) return;
+          pending = true;
+          try {
+            handleLoadOutcome(await Promise.resolve(callNative('loadUserIr', slot)));
+          } catch (_) {
+            flashIrError();
+          } finally {
+            pending = false;
+          }
+        });
+      }
+      if (clearBtn) clearBtn.addEventListener('click', () => {
+        clearIrError();
+        if (typeof dismissPendingIrConfirmFn === 'function') dismissPendingIrConfirmFn(true);
+        callNative('clearUserIr', slot);
+      });
       if (card) {
         const setDrag = on => card.classList && card.classList.toggle('ir-dragover', on);
         card.addEventListener('dragenter', e => { e.preventDefault(); e.stopPropagation(); setDrag(true); });
         card.addEventListener('dragover',  e => { e.preventDefault(); e.stopPropagation(); setDrag(true); });
-        card.addEventListener('dragleave', e => { e.preventDefault(); e.stopPropagation(); setDrag(false); });
+        card.addEventListener('dragleave', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.relatedTarget && typeof card.contains === 'function' && card.contains(e.relatedTarget)) return;
+          setDrag(false);
+        });
+        if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+          window.addEventListener('dragend', () => setDrag(false));
+          window.addEventListener('drop', () => setDrag(false));
+        }
         card.addEventListener('drop', e => {
           e.preventDefault();
           e.stopPropagation();
@@ -2146,7 +3601,34 @@
           const files = e.dataTransfer && e.dataTransfer.files;
           const file  = files && files[0];
           if (!file) return;
-          if (typeof FileReader === 'undefined' || file.size < 44 || file.size > 16 * 1024 * 1024) {
+          if (file.size < 44 || file.size > 16 * 1024 * 1024) {
+            flashIrError(cabTag + ' IR rejected (' + (file.name || 'file') + '): size must be 44 B–16 MiB.');
+            return;
+          }
+          const irFileName = file.name || ('Cab' + (slot === 0 ? 'A' : 'B') + '.wav');
+          if (typeof window !== 'undefined' && window.__WD_WEB_HOST__) {
+            if (typeof file.arrayBuffer === 'function') {
+              file.arrayBuffer()
+                .then(ab => callNative('dropUserIrBuffer', slot, irFileName, ab))
+                .then(handleLoadOutcome)
+                .catch(() => flashIrError());
+              return;
+            }
+            if (typeof FileReader !== 'undefined') {
+              const reader = new FileReader();
+              reader.onerror = () => flashIrError();
+              reader.onload = () => {
+                const ab = reader.result;
+                if (!(ab instanceof ArrayBuffer)) { flashIrError(); return; }
+                Promise.resolve(callNative('dropUserIrBuffer', slot, irFileName, ab))
+                  .then(handleLoadOutcome)
+                  .catch(() => flashIrError());
+              };
+              reader.readAsArrayBuffer(file);
+              return;
+            }
+          }
+          if (typeof FileReader === 'undefined') {
             flashIrError();
             return;
           }
@@ -2157,8 +3639,9 @@
             const comma = res.indexOf(',');
             const b64 = comma >= 0 ? res.slice(comma + 1) : res;
             if (!b64) { flashIrError(); return; }
-            Promise.resolve(callNative('dropUserIrBase64', slot, file.name || ('Cab' + (slot === 0 ? 'A' : 'B') + '.wav'), b64))
-              .then(handleLoadOutcome);
+            Promise.resolve(callNative('dropUserIrBase64', slot, irFileName, b64))
+              .then(handleLoadOutcome)
+              .catch(() => flashIrError());
           };
           reader.readAsDataURL(file);
         });
@@ -2167,93 +3650,106 @@
     bindUserIrSlot(0, 'irLoadABtn', 'irClearABtn', 'cardCabA');
     bindUserIrSlot(1, 'irLoadBBtn', 'irClearBBtn', 'cardCabB');
 
-    // In-Plugin Factory Preset Selector (12 Rigs across VST3, CLAP, Standalone & Wasm)
-    const UI_PARAM_META = [
-      ['loadEnabled', 'toggle', false],
-      ['guitarVol', 'slider', 0.0, 10.0, 1.0, 10.0],
-      ['guitarTone', 'slider', 0.0, 10.0, 1.0, 10.0],
-      ['cableLenM', 'slider', 0.5, 12.0, 1.0, 3.0],
-      ['reactiveMode', 'combo', 1],
-      ['gateEnabled', 'toggle', false],
-      ['gateThresh', 'slider', -80.0, -18.0, 1.0, -52.0],
-      ['gateRelease', 'slider', 25.0, 350.0, 1.0, 65.0],
-      ['boostEnabled', 'toggle', false],
-      ['boostTopo', 'combo', 0],
-      ['boostDrive', 'slider', 0.0, 1.0, 1.0, 0.25],
-      ['boostTone', 'slider', 0.0, 1.0, 1.0, 0.55],
-      ['boostLevel', 'slider', 0.0, 1.0, 1.0, 0.75],
-      ['preampEnabled', 'toggle', false],
-      ['channel', 'combo', 1],
-      ['preampGain', 'slider', 0.0, 1.0, 1.0, 0.55],
-      ['bass', 'slider', 0.0, 1.0, 1.0, 0.50],
-      ['mid', 'slider', 0.0, 1.0, 1.0, 0.50],
-      ['treble', 'slider', 0.0, 1.0, 1.0, 0.55],
-      ['preampBias', 'slider', -1.5, 1.0, 1.0, 0.0],
-      ['preampAge', 'slider', 0.0, 1.0, 1.0, 0.15],
-      ['powerAmpEnabled', 'toggle', false],
-      ['powerTube', 'combo', 0],
-      ['rectifier', 'combo', 0],
-      ['masterVol', 'slider', 0.0, 1.0, 1.0, 0.55],
-      ['presence', 'slider', 0.0, 1.0, 1.0, 0.50],
-      ['depth', 'slider', 0.0, 1.0, 1.0, 0.50],
-      ['nfbAmount', 'slider', 0.0, 1.0, 1.0, 0.55],
-      ['powerBias', 'slider', -56.0, -30.0, 1.0, -43.0],
-      ['powerAge', 'slider', 0.0, 1.0, 1.0, 0.18],
-      ['xfmrDrive', 'slider', 0.0, 1.0, 1.0, 0.50],
-      ['powerScaleW', 'slider', 5.0, 120.0, 1.0, 50.0],
-      ['impRatio', 'slider', 0.50, 2.00, 1.0, 1.00],
-      ['cabEnabled', 'toggle', true],
-      ['cabModel', 'combo', 2],
-      ['cabBoxScale', 'slider', 0.85, 1.15, 1.0, 1.00],
-      ['cabConeDamp', 'slider', 0.70, 1.40, 1.0, 1.00],
-      ['cabALoResDb', 'slider', -6.0, 6.0, 1.0, 0.0],
-      ['cabAHiResDb', 'slider', -6.0, 6.0, 1.0, 0.0],
-      ['cabAHpfHz', 'slider', 20.0, 400.0, 0.42, 20.0],
-      ['cabALpfHz', 'slider', 2000.0, 20000.0, 0.42, 20000.0],
-      ['cabAPan', 'slider', -1.0, 1.0, 1.0, -0.25],
-      ['cabALevelDb', 'slider', -24.0, 12.0, 1.0, 0.0],
-      ['micEnabled', 'toggle', true],
-      ['micModel', 'combo', 0],
-      ['micDistCm', 'slider', 0.5, 50.0, 0.50, 2.5],
-      ['micOffAxis', 'slider', 0.0, 45.0, 1.0, 12.0],
-      ['micConePos', 'slider', 0.0, 1.0, 1.0, 0.35],
-      ['micDrive', 'slider', -12.0, 24.0, 1.0, 0.0],
-      ['micPreDrive', 'slider', -12.0, 24.0, 1.0, 0.0],
-      ['micPhase', 'toggle', false],
-      ['micPreModel', 'combo', 1],
-      ['cabBEnabled', 'toggle', true],
-      ['cabBModel', 'combo', 1],
-      ['cabBBoxScale', 'slider', 0.85, 1.15, 1.0, 1.00],
-      ['cabBConeDamp', 'slider', 0.70, 1.40, 1.0, 1.00],
-      ['cabBLoResDb', 'slider', -6.0, 6.0, 1.0, 0.0],
-      ['cabBHiResDb', 'slider', -6.0, 6.0, 1.0, 0.0],
-      ['cabBHpfHz', 'slider', 20.0, 400.0, 0.42, 20.0],
-      ['cabBLpfHz', 'slider', 2000.0, 20000.0, 0.42, 20000.0],
-      ['cabBPan', 'slider', -1.0, 1.0, 1.0, 0.25],
-      ['cabBLevelDb', 'slider', -24.0, 12.0, 1.0, 0.0],
-      ['micBEnabled', 'toggle', true],
-      ['micBModel', 'combo', 1],
-      ['micBDistCm', 'slider', 0.5, 50.0, 0.50, 2.5],
-      ['micBOffAxis', 'slider', 0.0, 45.0, 1.0, 10.0],
-      ['micBConePos', 'slider', 0.0, 1.0, 1.0, 0.40],
-      ['micBDrive', 'slider', -12.0, 24.0, 1.0, 0.0],
-      ['micBPreDrive', 'slider', -12.0, 24.0, 1.0, 0.0],
-      ['micBPhase', 'toggle', false],
-      ['micBPreModel', 'combo', 2],
-      ['roomEnabled', 'toggle', true],
-      ['roomType', 'combo', 1],
-      ['roomPanMode', 'combo', 0],
-      ['roomSize', 'slider', 0.60, 1.50, 1.0, 1.00],
-      ['roomDistM', 'slider', 0.40, 6.00, 1.0, 2.20],
-      ['roomDamp', 'slider', 0.0, 1.0, 1.0, 0.45],
-      ['roomWidth', 'slider', 0.0, 1.0, 1.0, 0.80],
-      ['roomLevel', 'slider', 0.0, 1.0, 1.0, 0.28],
-      ['inputCal', 'slider', -18.0, 18.0, 1.0, 0.0],
-      ['outputDb', 'slider', -36.0, 18.0, 1.0, 0.0],
-      ['power', 'toggle', true],
-      ['roomSmash', 'slider', 0.0, 1.0, 1.0, 0.0]
-    ];
+    // Header A/B/Copy & Save/Load Preset Controls
+    const abBtnA = $('abSlotABtn');
+    const abBtnB = $('abSlotBBtn');
+    const abCopyBtn = $('abCopyBtn');
+    let abCopyTimer = null;
+    if (abBtnA) {
+      abBtnA.addEventListener('click', () => {
+        if (dismissPendingIrConfirmFn) dismissPendingIrConfirmFn(true);
+        Promise.resolve(callNative('selectAbSlot', 0)).then(ok => {
+          if (ok === true) {
+            telem.abSlotActive = 0;
+            telem.cabADelta = false;
+            telem.cabBDelta = false;
+            syncAbFromTelemetry(telem);
+            syncCabDeltaFromTelemetry(telem);
+          }
+        });
+      });
+    }
+    if (abBtnB) {
+      abBtnB.addEventListener('click', () => {
+        if (dismissPendingIrConfirmFn) dismissPendingIrConfirmFn(true);
+        Promise.resolve(callNative('selectAbSlot', 1)).then(ok => {
+          if (ok === true) {
+            telem.abSlotActive = 1;
+            telem.cabADelta = false;
+            telem.cabBDelta = false;
+            syncAbFromTelemetry(telem);
+            syncCabDeltaFromTelemetry(telem);
+          }
+        });
+      });
+    }
+    if (abCopyBtn) {
+      const copyIdle = abCopyBtn.textContent || 'COPY';
+      abCopyBtn.addEventListener('click', () => {
+        const curSlot = (telem && (telem.abSlotActive === 1 || telem.abSlotActive === true)) ? 1 : 0;
+        Promise.resolve(callNative('copyAbSlot', curSlot)).then(ok => {
+          if (ok === true && abCopyBtn.classList) {
+            abCopyBtn.classList.add('on');
+            abCopyBtn.textContent = 'COPIED';
+            if (abCopyTimer) clearTimeout(abCopyTimer);
+            abCopyTimer = setTimeout(() => {
+              abCopyBtn.classList.remove('on');
+              abCopyBtn.textContent = copyIdle;
+              abCopyTimer = null;
+            }, 1050);
+          }
+        });
+      });
+    }
 
+    const presetSaveBtn = $('presetSaveBtn');
+    const presetLoadBtn = $('presetLoadBtn');
+    let presetIoPending = false;
+    const clearPresetBtnError = (btn, source = 'preset') => {
+      if (btn && btn.classList) btn.classList.remove('ir-error');
+      clearUiError(source);
+    };
+    const flashPresetBtnError = (btn, msg, source = 'preset') => {
+      if (btn && btn.classList) btn.classList.add('ir-error');
+      showUiError(msg, source);
+    };
+    if (presetSaveBtn) {
+      presetSaveBtn.addEventListener('click', async () => {
+        if (presetIoPending) return;
+        presetIoPending = true;
+        try {
+          const sel = $('rigPresetSel');
+          let suggested = 'WD_Cab_Rig';
+          if (sel && sel.value !== '' && sel.options && typeof sel.selectedIndex === 'number' && sel.selectedIndex >= 0 && sel.options[sel.selectedIndex]) {
+            suggested = String(sel.options[sel.selectedIndex].textContent || '').replace(/^\d+\.\s*/, '').trim() || 'WD_Cab_Rig';
+          }
+          const ok = await Promise.resolve(callNative('savePresetFile', suggested));
+          if (ok === false) flashPresetBtnError(presetSaveBtn, 'Failed to save .wdcab preset file.', 'presetSave');
+          else if (ok === true) clearPresetBtnError(presetSaveBtn, 'presetSave');
+        } catch (_) {
+          flashPresetBtnError(presetSaveBtn, 'Failed to save .wdcab preset file.', 'presetSave');
+        } finally {
+          presetIoPending = false;
+        }
+      });
+    }
+    if (presetLoadBtn) {
+      presetLoadBtn.addEventListener('click', async () => {
+        if (presetIoPending) return;
+        presetIoPending = true;
+        try {
+          const ok = await Promise.resolve(callNative('loadPresetFile'));
+          if (ok === false) flashPresetBtnError(presetLoadBtn, 'Failed to load preset — invalid or unreadable .wdcab / .xml file.', 'presetLoad');
+          else if (ok === true) clearPresetBtnError(presetLoadBtn, 'presetLoad');
+        } catch (_) {
+          flashPresetBtnError(presetLoadBtn, 'Failed to load preset — invalid or unreadable .wdcab / .xml file.', 'presetLoad');
+        } finally {
+          presetIoPending = false;
+        }
+      });
+    }
+
+    // In-Plugin Factory Preset Selector (12 Rigs across VST3, CLAP, Standalone & Wasm)
     const FACTORY_PRESETS = [
       { powerTube: 0, power: true, cabEnabled: true, cabModel: 2, cabBoxScale: 1.0, cabConeDamp: 1.0, cabALoResDb: 0.0, cabAHiResDb: 0.0, cabAHpfHz: 20, cabALpfHz: 20000, cabAPan: -0.25, cabALevelDb: 0.0, micEnabled: true, micModel: 0, micDistCm: 2.5, micOffAxis: 12, micConePos: 0.35, micDrive: 0.0, micPreDrive: 0.0, micPhase: false, micPreModel: 1, cabBEnabled: true, cabBModel: 1, cabBBoxScale: 1.0, cabBConeDamp: 1.0, cabBLoResDb: 0.0, cabBHiResDb: 0.0, cabBHpfHz: 20, cabBLpfHz: 20000, cabBPan: 0.25, cabBLevelDb: 0.0, micBEnabled: true, micBModel: 1, micBDistCm: 2.5, micBOffAxis: 10, micBConePos: 0.40, micBDrive: 0.0, micBPreDrive: 0.0, micBPhase: false, micBPreModel: 2, inputCal: 0.0, masterVol: 0.55, impRatio: 1.00, powerScaleW: 50, depth: 0.50, presence: 0.50, nfbAmount: 0.55, roomEnabled: true, roomType: 1, roomPanMode: 0, roomSize: 1.0, roomDistM: 2.2, roomDamp: 0.45, roomWidth: 0.80, roomLevel: 0.28, roomSmash: 0.0, outputDb: 0.0 },
       { powerTube: 0, power: true, cabEnabled: true, cabModel: 3, cabBoxScale: 1.02, cabConeDamp: 1.08, cabALoResDb: 0.8, cabAHiResDb: 0.6, cabAHpfHz: 65, cabALpfHz: 11500, cabAPan: -0.35, cabALevelDb: 0.0, micEnabled: true, micModel: 0, micDistCm: 1.5, micOffAxis: 8, micConePos: 0.30, micDrive: 2.5, micPreDrive: 3.0, micPhase: false, micPreModel: 2, cabBEnabled: true, cabBModel: 2, cabBBoxScale: 1.0, cabBConeDamp: 1.05, cabBLoResDb: 0.5, cabBHiResDb: 0.4, cabBHpfHz: 65, cabBLpfHz: 12000, cabBPan: 0.35, cabBLevelDb: -1.0, micBEnabled: true, micBModel: 3, micBDistCm: 2.0, micBOffAxis: 14, micBConePos: 0.36, micBDrive: 2.0, micBPreDrive: 2.5, micBPhase: false, micBPreModel: 1, inputCal: 0.0, masterVol: 0.68, impRatio: 1.00, powerScaleW: 100, depth: 0.58, presence: 0.56, nfbAmount: 0.68, roomEnabled: true, roomType: 0, roomPanMode: 0, roomSize: 0.85, roomDistM: 1.4, roomDamp: 0.55, roomWidth: 0.65, roomLevel: 0.14, roomSmash: 0.0, outputDb: 0.0 },
@@ -2269,38 +3765,355 @@
       { powerTube: 1, power: true, cabEnabled: true, cabModel: 10, cabBoxScale: 0.96, cabConeDamp: 0.90, cabALoResDb: -0.5, cabAHiResDb: 1.2, cabAHpfHz: 85, cabALpfHz: 9500, cabAPan: 0.0, cabALevelDb: 0.0, micEnabled: true, micModel: 0, micDistCm: 3.5, micOffAxis: 18, micConePos: 0.45, micDrive: 5.0, micPreDrive: 8.5, micPhase: false, micPreModel: 5, cabBEnabled: false, cabBModel: 1, cabBBoxScale: 1.0, cabBConeDamp: 1.0, cabBLoResDb: 0.0, cabBHiResDb: 0.0, cabBHpfHz: 20, cabBLpfHz: 20000, cabBPan: 0.25, cabBLevelDb: 0.0, micBEnabled: true, micBModel: 1, micBDistCm: 2.5, micBOffAxis: 10, micBConePos: 0.40, micBDrive: 0.0, micBPreDrive: 0.0, micBPhase: false, micBPreModel: 2, inputCal: 0.0, masterVol: 0.76, impRatio: 1.20, powerScaleW: 15, depth: 0.42, presence: 0.60, nfbAmount: 0.35, roomEnabled: true, roomType: 3, roomPanMode: 0, roomSize: 0.92, roomDistM: 2.0, roomDamp: 0.30, roomWidth: 0.88, roomLevel: 0.55, roomSmash: 0.92, outputDb: -1.5 }
     ];
 
+    function enhancePresetSelect (sel) {
+      if (!sel || typeof document === 'undefined' || !document.body || typeof document.createElement !== 'function') return;
+      if (typeof sel.addEventListener !== 'function') return;
+
+      const menuId = (sel.id || 'wdPreset') + '_menu';
+      if (typeof sel.setAttribute === 'function') {
+        sel.setAttribute('aria-haspopup', 'listbox');
+        sel.setAttribute('aria-expanded', 'false');
+      }
+
+      let menuEl = null;
+      let openItems = [];
+      let openOpts = [];
+      let activeIdx = -1;
+
+      const getVisibleOptions = () => {
+        const opts = sel.options ? Array.from(sel.options) : [];
+        return opts.filter(o => o && !o.hidden && !o.disabled);
+      };
+
+      const setActive = idx => {
+        if (!openItems.length) { activeIdx = -1; return; }
+        activeIdx = Math.max(0, Math.min(openItems.length - 1, idx));
+        for (let i = 0; i < openItems.length; i++) {
+          const item = openItems[i];
+          if (item && item.classList) item.classList.toggle('active', i === activeIdx);
+        }
+        const act = openItems[activeIdx];
+        if (act && act.id && typeof sel.setAttribute === 'function') {
+          sel.setAttribute('aria-activedescendant', act.id);
+        }
+        if (act && typeof act.scrollIntoView === 'function') {
+          try { act.scrollIntoView({ block: 'nearest' }); } catch (_) {}
+        }
+      };
+
+      const closeMenu = () => {
+        if (!menuEl) return;
+        if (typeof document.removeEventListener === 'function') {
+          document.removeEventListener('mousedown', onDocMouseDown, true);
+        }
+        if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+          window.removeEventListener('blur', closeMenu);
+          window.removeEventListener('resize', closeMenu);
+        }
+        if (typeof menuEl.remove === 'function') menuEl.remove();
+        else if (menuEl.parentElement && typeof menuEl.parentElement.removeChild === 'function') {
+          menuEl.parentElement.removeChild(menuEl);
+        }
+        if (typeof sel.setAttribute === 'function') sel.setAttribute('aria-expanded', 'false');
+        if (typeof sel.removeAttribute === 'function') {
+          sel.removeAttribute('aria-controls');
+          sel.removeAttribute('aria-activedescendant');
+        }
+        menuEl = null;
+        openItems = [];
+        openOpts = [];
+        activeIdx = -1;
+      };
+
+      const onDocMouseDown = e => {
+        if (!menuEl) return;
+        const tgt = e && e.target;
+        if (tgt === sel || (typeof menuEl.contains === 'function' && menuEl.contains(tgt))) return;
+        closeMenu();
+      };
+
+      const selectValue = val => {
+        closeMenu();
+        sel.value = String(val);
+        if (typeof Event === 'function' && typeof sel.dispatchEvent === 'function') {
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      };
+
+      const openMenu = () => {
+        closeMenu();
+        openOpts = getVisibleOptions();
+        if (!openOpts.length) return;
+
+        menuEl = document.createElement('div');
+        menuEl.id = menuId;
+        menuEl.className = 'wd-preset-menu';
+        if (typeof menuEl.setAttribute === 'function') {
+          menuEl.setAttribute('role', 'listbox');
+          menuEl.setAttribute('aria-label', 'Factory Rig Presets');
+        }
+
+        const curVal = String(sel.value);
+        let initIdx = 0;
+        openItems = openOpts.map((opt, idx) => {
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.id = menuId + '_opt_' + idx;
+          item.className = 'wd-preset-item';
+          item.textContent = opt.textContent || '';
+          if (item.dataset) item.dataset.value = String(opt.value);
+          if (typeof item.setAttribute === 'function') item.setAttribute('role', 'option');
+          if (String(opt.value) === curVal) {
+            initIdx = idx;
+            if (item.classList) item.classList.add('selected');
+            if (typeof item.setAttribute === 'function') item.setAttribute('aria-selected', 'true');
+          } else if (typeof item.setAttribute === 'function') {
+            item.setAttribute('aria-selected', 'false');
+          }
+          item.addEventListener('mousedown', e => {
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+          });
+          item.addEventListener('mouseenter', () => setActive(idx));
+          item.addEventListener('click', e => {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            selectValue(opt.value);
+          });
+          menuEl.appendChild(item);
+          return item;
+        });
+
+        const rect = typeof sel.getBoundingClientRect === 'function'
+          ? sel.getBoundingClientRect()
+          : { left: 0, top: 0, bottom: 28, width: 180, height: 28 };
+        const vw = (document.documentElement && document.documentElement.clientWidth) || (typeof window !== 'undefined' && window.innerWidth) || 1180;
+        const vh = (document.documentElement && document.documentElement.clientHeight) || (typeof window !== 'undefined' && window.innerHeight) || 760;
+        const minW = Math.max(200, Math.round(rect.width || 180));
+        const spaceBelow = Math.max(0, vh - (rect.bottom || 28) - 8);
+        const spaceAbove = Math.max(0, (rect.top || 0) - 8);
+        const openAbove = spaceBelow < 160 && spaceAbove > spaceBelow;
+        const maxH = Math.max(110, Math.min(300, openAbove ? spaceAbove : spaceBelow));
+        menuEl.style.left = Math.max(6, Math.min(rect.left || 0, vw - minW - 6)) + 'px';
+        menuEl.style.minWidth = minW + 'px';
+        menuEl.style.maxHeight = Math.round(maxH) + 'px';
+        if (openAbove) {
+          menuEl.style.bottom = Math.max(6, vh - (rect.top || 0) + 4) + 'px';
+          menuEl.style.top = 'auto';
+        } else {
+          menuEl.style.top = Math.min(vh - 40, (rect.bottom || 28) + 4) + 'px';
+          menuEl.style.bottom = 'auto';
+        }
+
+        document.body.appendChild(menuEl);
+        if (typeof sel.setAttribute === 'function') {
+          sel.setAttribute('aria-controls', menuId);
+          sel.setAttribute('aria-expanded', 'true');
+        }
+        setActive(initIdx);
+
+        if (typeof document.addEventListener === 'function') {
+          document.addEventListener('mousedown', onDocMouseDown, true);
+        }
+        if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+          window.addEventListener('blur', closeMenu);
+          window.addEventListener('resize', closeMenu);
+        }
+      };
+
+      sel.addEventListener('mousedown', e => {
+        if (e && typeof e.button === 'number' && e.button !== 0) return;
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof sel.focus === 'function') {
+          try { sel.focus(); } catch (_) {}
+        }
+        if (menuEl) closeMenu();
+        else openMenu();
+      });
+
+      sel.addEventListener('click', e => {
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
+        if (e && typeof e.detail === 'number' && e.detail > 0) return;
+        if (menuEl) closeMenu();
+        else openMenu();
+      });
+
+      sel.addEventListener('keydown', e => {
+        if (!e) return;
+        const k = e.key;
+        if (!menuEl) {
+          if (k === 'Enter' || k === ' ' || k === 'F4' || k === 'ArrowDown' || k === 'ArrowUp') {
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+            openMenu();
+          }
+          return;
+        }
+        if (k === 'Escape' || k === 'Tab') {
+          if (typeof e.preventDefault === 'function') e.preventDefault();
+          closeMenu();
+        } else if (k === 'ArrowDown') {
+          if (typeof e.preventDefault === 'function') e.preventDefault();
+          setActive(activeIdx + 1);
+        } else if (k === 'ArrowUp') {
+          if (typeof e.preventDefault === 'function') e.preventDefault();
+          setActive(activeIdx - 1);
+        } else if (k === 'Home') {
+          if (typeof e.preventDefault === 'function') e.preventDefault();
+          setActive(0);
+        } else if (k === 'End') {
+          if (typeof e.preventDefault === 'function') e.preventDefault();
+          setActive(openItems.length - 1);
+        } else if (k === 'Enter' || k === ' ') {
+          if (typeof e.preventDefault === 'function') e.preventDefault();
+          const opt = openOpts[activeIdx];
+          if (opt) selectValue(opt.value);
+          else closeMenu();
+        }
+      });
+    }
+
     const presetSel = $('rigPresetSel');
     if (presetSel) {
-      presetSel.addEventListener('change', () => {
-        const idx = Math.max(0, Math.min(FACTORY_PRESETS.length - 1, Number(presetSel.value) || 0));
+      enhancePresetSelect(presetSel);
+      const irConfirmBanner  = $('irConfirmBanner');
+      const irConfirmProceed = $('irConfirmProceedBtn');
+      const irConfirmCancel  = $('irConfirmCancelBtn');
+      let pendingPresetConfirm = null;
+
+      const AMP_SECTION_PARAM_IDS = new Set([
+        'loadEnabled', 'guitarVol', 'guitarTone', 'cableLenM', 'reactiveMode',
+        'loadPickupModel', 'loadWiring', 'loadBleedType', 'loadCablePreset', 'loadDielectricLoss', 'loadCouplingProfile',
+        'gateEnabled', 'gateThresh', 'gateRelease',
+        'boostEnabled', 'boostTopo', 'boostDrive', 'boostTone', 'boostLevel',
+        'preampEnabled', 'channel', 'preampGain', 'bass', 'mid', 'treble', 'preampBias', 'preampAge',
+        'powerAmpEnabled', 'rectifier', 'powerBias', 'powerAge', 'xfmrDrive',
+        'fxLoopEnabled', 'fxLoopMode', 'fxLoopTime', 'fxLoopFeedback', 'fxLoopMix'
+      ]);
+
+      const applyFactoryPreset = idx => {
         const p = FACTORY_PRESETS[idx];
         if (!p) return;
+        const preserveAmpMode = isPowerAmpActive() && !Object.prototype.hasOwnProperty.call(p, 'powerAmpEnabled');
+        if (dismissPendingIrConfirmFn) dismissPendingIrConfirmFn(false);
+        presetSyncInFlight++;
+        lastSyncedTelemetryPreset = idx;
+        if (presetSel.value !== String(idx)) presetSel.value = String(idx);
+        clearUiError();
         callNative('clearUserIr', 0);
         callNative('clearUserIr', 1);
+        syncCabDeltaFromTelemetry({ cabADelta: false, cabBDelta: false });
         for (const entry of UI_PARAM_META) {
           const id = entry[0], kind = entry[1];
+          if (preserveAmpMode && AMP_SECTION_PARAM_IDS.has(id)) continue;
           if (kind === 'toggle') {
             const val = Object.prototype.hasOwnProperty.call(p, id) ? !!p[id] : !!entry[2];
             const st = toggleState(id);
-            if (st) st.setValue(val);
+            if (st) {
+              const curVal = typeof st.getValue === 'function' ? !!st.getValue() : null;
+              if (curVal !== val) st.setValue(val);
+            }
           } else if (kind === 'combo') {
             const val = Object.prototype.hasOwnProperty.call(p, id) ? p[id] : entry[2];
             const st = comboState(id);
-            if (st) st.setChoiceIndex(val);
+            if (st) {
+              const nChoices = (st.properties && Array.isArray(st.properties.choices)) ? st.properties.choices.length : 0;
+              let curIdx = null;
+              if (typeof st.getChoiceIndex === 'function' && (nChoices > 1 || !st.properties)) {
+                const rawCur = st.getChoiceIndex();
+                if (typeof rawCur === 'number' && Number.isFinite(rawCur)) curIdx = Math.round(rawCur);
+              } else if (typeof st.value === 'number' && Number.isFinite(st.value) && nChoices > 1) {
+                curIdx = Math.round(st.value * (nChoices - 1));
+              }
+              if (curIdx !== Math.round(val)) st.setChoiceIndex(val);
+            }
           } else if (kind === 'slider') {
             const min = entry[2], max = entry[3], skew = entry[4], defVal = entry[5];
             const val = Object.prototype.hasOwnProperty.call(p, id) ? p[id] : defVal;
-            const lin = Math.max(0, Math.min(1, (val - min) / Math.max(1e-9, max - min)));
-            const norm = (skew !== 1.0 && lin > 0.0) ? Math.pow(lin, skew) : lin;
             const st = sliderState(id);
+            const range = resolveSliderRange(st, min, max, skew);
+            const lin = Math.max(0, Math.min(1, (val - range.start) / Math.max(1e-9, range.end - range.start)));
+            const norm = (range.skew !== 1.0 && lin > 0.0) ? Math.pow(lin, range.skew) : lin;
             if (st) {
-              if (typeof st.sliderDragStarted === 'function') st.sliderDragStarted();
-              st.setNormalisedValue(norm);
-              if (typeof st.sliderDragEnded === 'function') st.sliderDragEnded();
+              const curNorm = typeof st.getNormalisedValue === 'function' ? st.getNormalisedValue() : NaN;
+              if (!Number.isFinite(curNorm) || Math.abs(curNorm - norm) > 1e-5) {
+                if (typeof st.sliderDragStarted === 'function') st.sliderDragStarted();
+                st.setNormalisedValue(norm);
+                if (typeof st.sliderDragEnded === 'function') st.sliderDragEnded();
+              }
             }
           }
         }
-        callNative('syncPresetUi', idx);
+        Promise.resolve(callNative('syncPresetUi', idx)).finally(() => {
+          presetSyncInFlight = Math.max(0, presetSyncInFlight - 1);
+        });
+        if (!preserveAmpMode && rigMode !== 'cab' && (!toggleState('powerAmpEnabled') || !toggleState('powerAmpEnabled').getValue())) {
+          syncRigModeFromPowerAmp(false);
+        }
+        if (updateRigDerivedUiFn) updateRigDerivedUiFn();
+      };
+
+      const closeIrConfirm = (restorePrev = true) => {
+        if (irConfirmBanner) irConfirmBanner.hidden = true;
+        if (restorePrev && pendingPresetConfirm) {
+          presetSel.value = pendingPresetConfirm.prevVal;
+        }
+        pendingPresetConfirm = null;
+      };
+      dismissPendingIrConfirmFn = (restorePrev = true) => {
+        if (pendingPresetConfirm || (irConfirmBanner && !irConfirmBanner.hidden)) {
+          closeIrConfirm(restorePrev);
+        }
+      };
+      if (typeof window !== 'undefined') {
+        window.__wdDismissIrConfirm = (restorePrev = true) => {
+          if (dismissPendingIrConfirmFn) dismissPendingIrConfirmFn(restorePrev);
+        };
+      }
+      if (irConfirmProceed) {
+        irConfirmProceed.addEventListener('click', () => {
+          const req = pendingPresetConfirm;
+          closeIrConfirm(false);
+          if (req) applyFactoryPreset(req.idx);
+        });
+      }
+      if (irConfirmCancel) {
+        irConfirmCancel.addEventListener('click', () => {
+          closeIrConfirm(true);
+          if (typeof presetSel.focus === 'function') { try { presetSel.focus(); } catch (_) {} }
+        });
+      }
+      if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+        document.addEventListener('keydown', e => {
+          if (e && e.key === 'Escape' && pendingPresetConfirm) {
+            closeIrConfirm(true);
+            if (typeof presetSel.focus === 'function') { try { presetSel.focus(); } catch (_) {} }
+          }
+        });
+      }
+
+      presetSel.addEventListener('change', () => {
+        if (presetSel.value === '') return;
+        const idx = Math.max(0, Math.min(FACTORY_PRESETS.length - 1, Number(presetSel.value) || 0));
+        if (!FACTORY_PRESETS[idx]) return;
+        const hasUserIr = !!(telem && (telem.cabACustomIr || telem.cabBCustomIr));
+        if (hasUserIr && irConfirmBanner) {
+          if (typeof window !== 'undefined' && typeof window.__wdDismissWtIrConfirm === 'function') {
+            window.__wdDismissWtIrConfirm(true, false);
+          }
+          const prevVal = (!hasUserIr && typeof lastSyncedTelemetryPreset === 'number' && lastSyncedTelemetryPreset >= 0)
+            ? String(lastSyncedTelemetryPreset)
+            : '';
+          pendingPresetConfirm = { idx, prevVal };
+          const loadedSlots = [];
+          if (telem.cabACustomIr) loadedSlots.push('Cab A (' + (telem.cabACustomIrName || 'User IR') + ')');
+          if (telem.cabBCustomIr) loadedSlots.push('Cab B (' + (telem.cabBCustomIrName || 'User IR') + ')');
+          const txtEl = $('irConfirmText');
+          if (txtEl) txtEl.textContent = 'Loading factory preset will clear User IR on ' + loadedSlots.join(' & ') + '.';
+          irConfirmBanner.hidden = false;
+          if (irConfirmCancel && typeof irConfirmCancel.focus === 'function') {
+            try { irConfirmCancel.focus(); } catch (_) {}
+          }
+          return;
+        }
+        applyFactoryPreset(idx);
       });
     }
 

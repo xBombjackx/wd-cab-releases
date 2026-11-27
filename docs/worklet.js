@@ -1,11 +1,11 @@
 // AudioWorkletProcessor hosting the WD Cab WebAssembly DSP core (wdcab.wasm).
 //
 // Runs the full C++20 5-state RK4 speaker motor, dual reactive cabinets,
-// 5 virtual microphones (2x oversampled capsule + transformer), 6 Analog Suite
+// 8 virtual microphones (2x oversampled capsule + transformer), 6 Analog Suite
 // mic preamps, and studio room engine in real time on the WebAudio thread,
 // streaming 280-float telemetry + live 64-point scope curves back to the UI.
 
-const NUM_PARAMS     = 83;
+const NUM_PARAMS     = 100;
 const TELEM_FLOATS   = 280;
 const MAX_WASM_BLOCK = 2048;
 const MAX_BLOCK      = MAX_WASM_BLOCK;
@@ -28,6 +28,11 @@ const PARAM_INDEX = {
   micBPreModel: 70, roomEnabled: 71, roomType: 72, roomPanMode: 73, roomSize: 74,
   roomDistM: 75, roomDamp: 76, roomWidth: 77, roomLevel: 78, inputCal: 79,
   outputDb: 80, power: 81, roomSmash: 82,
+  cabBDelayMs: 83, roomPreDelayMs: 84, roomLoCutHz: 85, roomHiCutHz: 86,
+  fxLoopEnabled: 87, fxLoopMode: 88, fxLoopTime: 89, fxLoopFeedback: 90, fxLoopMix: 91,
+  loadPickupModel: 92, loadWiring: 93, loadBleedType: 94, loadCablePreset: 95,
+  loadDielectricLoss: 96, loadCouplingProfile: 97,
+  cabACutOrder: 98, cabBCutOrder: 99,
 };
 
 function stubImports(module) {
@@ -45,8 +50,10 @@ class WdCabWorklet extends AudioWorkletProcessor {
     this.ready = false;
     this.failed = false;
     this.controlsDirty = false;
+    this.smoothTransitionPending = false;
     this.pending = [];
     this.telemCountdown = 0;
+    this.telemBuf = new Float32Array(TELEM_FLOATS);
     const fsWorklet = (typeof sampleRate === 'number' && Number.isFinite(sampleRate) && sampleRate > 0) ? sampleRate : 48000;
     this.telemPeriodQuanta = Math.max(6, Math.round(fsWorklet / (128 * 30))); // ~30 Hz telemetry/scope updates across sample rates
     const optResetSeq = options && options.processorOptions && typeof options.processorOptions.resetSeq === 'number' && Number.isFinite(options.processorOptions.resetSeq) ? options.processorOptions.resetSeq : 0;
@@ -112,6 +119,20 @@ class WdCabWorklet extends AudioWorkletProcessor {
         }
         this.controlsDirty = true;
       }
+      if (msg.smoothTransition) {
+        this.smoothTransitionPending = true;
+      }
+    } else if (msg.type === 'smoothTransition') {
+      if (this.controlsDirty) {
+        this.apply();
+      } else if (typeof this.wasm.wdcab_request_smooth_transition === 'function') {
+        this.wasm.wdcab_request_smooth_transition();
+      }
+    } else if (msg.type === 'setCabDelta') {
+      const slot = Number(msg.slot) | 0;
+      if ((slot === 0 || slot === 1) && typeof this.wasm.wdcab_set_cab_delta === 'function') {
+        this.wasm.wdcab_set_cab_delta(slot, msg.enabled ? 1 : 0);
+      }
     } else if (msg.type === 'param') {
       this.wasm.wdcab_set_param(msg.idx, msg.val);
       this.controlsDirty = true;
@@ -121,9 +142,56 @@ class WdCabWorklet extends AudioWorkletProcessor {
       }
       this.wasm.wdcab_reset();
       this.resetSeq = (typeof msg.resetSeq === 'number') ? msg.resetSeq : (this.resetSeq || 0);
+    } else if (msg.type === 'applyPreparedUserIr') {
+      const slot = Number(msg.slot) | 0;
+      const irLen = Number(msg.irLen) | 0;
+      const sr = Number(msg.sampleRate) || 48000;
+      const irRev = msg.irRev;
+      const ref48k = msg.ref48k;
+      const magDb = msg.magDb;
+      const phaseRad = msg.phaseRad;
+      const wave = msg.wave;
+      if ((slot === 0 || slot === 1) && irRev && irRev.length > 0 && irLen > 0 &&
+          typeof this.wasm.wdcab_apply_prepared_user_ir === 'function' &&
+          typeof this.wasm.wdcab_prepared_ir_rev_ptr === 'function')
+      {
+        const revPtr = this.wasm.wdcab_prepared_ir_rev_ptr();
+        const refPtr = this.wasm.wdcab_prepared_ir_ref_ptr();
+        const magPtr = this.wasm.wdcab_prepared_ir_mag_ptr();
+        const phasePtr = this.wasm.wdcab_prepared_ir_phase_ptr();
+        const wavePtr = this.wasm.wdcab_prepared_ir_wave_ptr();
+        this.refreshViews();
+        const nRev = Math.min(irLen, irRev.length, 16384);
+        this.f32.set(irRev.subarray(0, nRev), revPtr >> 2);
+        let nRef = 0;
+        if (ref48k && ref48k.length > 0 && refPtr) {
+          nRef = Math.min(ref48k.length, 8192);
+          this.f32.set(ref48k.subarray(0, nRef), refPtr >> 2);
+        }
+        if (magDb && magDb.length >= 64 && magPtr) {
+          this.f32.set(magDb.subarray(0, 64), magPtr >> 2);
+        }
+        if (phaseRad && phaseRad.length >= 64 && phasePtr) {
+          this.f32.set(phaseRad.subarray(0, 64), phasePtr >> 2);
+        }
+        if (wave && wave.length >= 128 && wavePtr) {
+          this.f32.set(wave.subarray(0, 128), wavePtr >> 2);
+        }
+        this.wasm.wdcab_apply_prepared_user_ir(
+          slot,
+          revPtr,
+          nRev,
+          sr,
+          nRef > 0 ? refPtr : 0,
+          nRef,
+          (magDb && magDb.length >= 64) ? magPtr : 0,
+          (phaseRad && phaseRad.length >= 64) ? phasePtr : 0,
+          (wave && wave.length >= 128) ? wavePtr : 0
+        );
+      }
     } else if (msg.type === 'loadUserIr') {
       const slot = Number(msg.slot) | 0;
-      const samples = msg.samples;
+      const samples = (msg.samples instanceof ArrayBuffer) ? new Float32Array(msg.samples) : msg.samples;
       const sr = Number(msg.sampleRate) || 48000;
       if ((slot === 0 || slot === 1) && samples && samples.length > 0 &&
           typeof this.wasm.wdcab_ir_scratch === 'function' &&
@@ -135,13 +203,27 @@ class WdCabWorklet extends AudioWorkletProcessor {
         const copyLen = Math.min(samples.length, maxCap);
         const scratchPtr = this.wasm.wdcab_ir_scratch();
         this.refreshViews();
-        this.f32.set(samples.subarray(0, copyLen), scratchPtr >> 2);
-        this.wasm.wdcab_load_user_ir(slot, scratchPtr, copyLen, sr);
+        const scratchIdx = scratchPtr >> 2;
+        if (scratchPtr > 0 && copyLen > 0 && scratchIdx + copyLen <= this.f32.length) {
+          this.f32.set(samples.subarray(0, copyLen), scratchIdx);
+          this.wasm.wdcab_load_user_ir(slot, scratchPtr, copyLen, sr);
+        }
       }
     } else if (msg.type === 'clearUserIr') {
       const slot = Number(msg.slot) | 0;
-      if ((slot === 0 || slot === 1) && typeof this.wasm.wdcab_clear_user_ir === 'function') {
-        this.wasm.wdcab_clear_user_ir(slot);
+      if (slot === 0 || slot === 1) {
+        if (msg.procIrRev && msg.procIrRev.length > 0 && (Number(msg.irLen) | 0) > 0 &&
+            typeof this.wasm.wdcab_clear_user_ir_prepared === 'function' &&
+            typeof this.wasm.wdcab_prepared_ir_rev_ptr === 'function')
+        {
+          const revPtr = this.wasm.wdcab_prepared_ir_rev_ptr();
+          this.refreshViews();
+          const nRev = Math.min(Number(msg.irLen) | 0, msg.procIrRev.length, 16384);
+          this.f32.set(msg.procIrRev.subarray(0, nRev), revPtr >> 2);
+          this.wasm.wdcab_clear_user_ir_prepared(slot, revPtr, nRev, Number(msg.sampleRate) || 48000);
+        } else if (typeof this.wasm.wdcab_clear_user_ir === 'function') {
+          this.wasm.wdcab_clear_user_ir(slot);
+        }
       }
     }
   }
@@ -153,6 +235,12 @@ class WdCabWorklet extends AudioWorkletProcessor {
     }
     this.wasm.wdcab_apply();
     this.controlsDirty = false;
+    if (this.smoothTransitionPending) {
+      this.smoothTransitionPending = false;
+      if (typeof this.wasm.wdcab_request_smooth_transition === 'function') {
+        this.wasm.wdcab_request_smooth_transition();
+      }
+    }
   }
 
   process(inputs, outputs) {
@@ -248,8 +336,13 @@ class WdCabWorklet extends AudioWorkletProcessor {
       this.telemCountdown = this.telemPeriodQuanta; // ~30 Hz at 48-384 kHz
       this.wasm.wdcab_update_telemetry();
       this.refreshViews();
-      const t = this.f32.slice(this.telem, this.telem + TELEM_FLOATS);
-      this.port.postMessage({ type: 'telemetry', data: t, resetSeq: this.resetSeq }, [t.buffer]);
+      const f32 = this.f32;
+      const telemBase = this.telem;
+      const telemBuf = this.telemBuf;
+      for (let i = 0; i < TELEM_FLOATS; i++) {
+        telemBuf[i] = f32[telemBase + i];
+      }
+      this.port.postMessage({ type: 'telemetry', data: telemBuf, resetSeq: this.resetSeq });
     }
     return true;
   }

@@ -1,12 +1,12 @@
-# Werewolf Dynamics — WD Cab (v0.2.1)
+# Werewolf Dynamics — WD Cab (v0.4.0)
 ![Downloads](https://img.shields.io/github/downloads/xBombjackx/wd-cab-releases/total)
 
-A guitar and bass speaker cabinet simulated as a coupled electromechanical system, not a static impulse response — free **VST3** and **CLAP** for Windows 64-bit, plus a full **live WebAssembly browser demo**.
+A guitar and bass speaker cabinet simulated as a coupled electromechanical system, not a static impulse response — now with an expandable full-rig **WD Amp** & **WD Load** front end across **100** synchronized parameters. Free **VST3** and **CLAP** for Windows 64-bit, plus a full **live WebAssembly browser demo**.
 
-An impulse response is a photograph of a speaker taken at one signal level. A real cabinet is a motor fighting an amplifier: palm mutes stretch the spider and push the cone's resonant frequency upward mid-chug, the moving impedance curve loads down the amplifier's negative-feedback loop, voice coils heat up and dynamically compress, and paper cones break up radially when pushed hard. **WD Cab** solves that coupled loop in real time while your amp signal runs through it.
+An impulse response is a photograph of a speaker taken at one signal level. A real cabinet is a motor fighting an amplifier: palm mutes stretch the spider and push the cone's resonant frequency upward mid-chug, the moving impedance curve loads down the amplifier's negative-feedback loop, voice coils heat up and dynamically compress, and paper cones break up radially when pushed hard. **WD Cab** defaults to **`CAB ONLY`** mode for running your amp head or hardware reactive load into the coupled motor, dual cabs, virtual mics, console preamps, and studio room — and expands with one click (**`AMP & LOAD`** or **`AMP + CABS`**) into the complete **WD Amp** + **WD Load** guitar rig for direct raw guitar/bass DI tracks.
 
 - **[Launch Live WebAssembly Browser Demo](https://xbombjackx.github.io/wd-cab-releases/)** — runs the exact C++20 DSP engine directly in your browser (WebAudio + WebAssembly, zero server uploads)
-- **[GitHub Releases](https://github.com/xBombjackx/wd-cab-releases/releases)** — Windows 64-bit VST3 & CLAP archives + offline HTML5 demo bundle
+- **[GitHub Releases](https://github.com/xBombjackx/wd-cab-releases/releases)** — Windows 64-bit VST3 & CLAP archives + offline HTML5 demo bundle + SHA-256 checksums
 - **[Itch.io Page](https://xbombjackx.itch.io/wd-cab)** — playable embed, screenshot, and direct download mirror
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/mighty_bombjack)
@@ -17,16 +17,31 @@ An impulse response is a photograph of a speaker taken at one signal level. A re
 
 Open **[https://xbombjackx.github.io/wd-cab-releases/](https://xbombjackx.github.io/wd-cab-releases/)** to audition **WD Cab** immediately without installing anything:
 
-- Switch seamlessly between a mid-gain **Super Lead** and high-gain **NTS** amp send (or drag-and-drop your own raw preamp / power-amp WAV stem) while keeping exact riff timing.
-- Audition all 12 built-in rig presets, drag dual virtual microphones across the 2D speaker grille, watch the live impedance *Z(f)* curve, resonant *F_s(x)* shift, and millimeter cone excursion react in real time, or drop custom `.wav` cabinet IRs directly onto **Cab A** or **Cab B**.
+- Switch the 3-way header selector between **`CAB ONLY`**, **`AMP & LOAD`**, and **`AMP + CABS`**, flip between a mid-gain **Super Lead** and high-gain **NTS** amp send (or drag-and-drop your own amp stem or raw guitar/bass WAV), and dial **WD Load** plus the pre-power-amp **Studio FX Loop**.
+- Audition all 12 built-in rig presets, compare rigs with instant **A/B (`A | B | COPY`)**, save/load portable **`.wdcab`** presets, toggle per-cab **Color Delta (`DELTA`)** to isolate nonlinear speaker/mic/preamp coloration, drag dual virtual microphones across the 2D speaker grille, watch the live impedance *Z(f)* curve, resonant *F_s(x)* shift, and millimeter cone excursion react in real time, or drop custom `.wav` cabinet IRs up to `8192` taps directly onto **Cab A** or **Cab B**.
 
 ## What's Inside
 
+- **3-Way Rig Mode (`CAB ONLY` | `AMP & LOAD` | `AMP + CABS`) & Full `WD Amp` / `WD Load` Front End (`100` Parameters):** Defaults to **`CAB ONLY`** (`powerAmpEnabled = false`) and expands on demand into **Expanded WD Load** (`5` pickup voicings, `'50s` vs. `Modern` wiring, treble-bleed networks, cable presets, dielectric loss, and HI-Z coupling profiles), input gate, `SD-1` / `TS9` ADAA1 diode overdrive, dual-channel `US Clean` / `Lead` cascaded Koren triode preamp + passive FMV tone stack, pre-power-amp **Studio FX Loop** (**Spring Tank**, **BBD Chorus/Delay**, **Tape Echo**), and coupled `6L6GC` / `EL34` power section with `Silicon` / `GZ34` / `5U4G` rectifier sag and OT Iron Drive.
 - **Coupled Speaker Motor & Impedance Matching:** 5-state nonlinear RK4 speaker motor tracking cone excursion *x(t)*, voice-coil thermal rise, Tight / Loose source-impedance coupling, and 4Ω / 8Ω / 16Ω Z-Match loading.
-- **Dual Procedural Cabinets + Custom `.wav` IR Loader (`Cab A` + `Cab B`):** Thirteen enclosures (`1x10 Tweed`, `1x12 Open`, `1x12 Ported`, `2x12 Open`, `2x12 Alnico`, `Vintage 4x12`, `Modern 4x12`, `Oversized Modern 4x12`, `4x12 Brit 75`, `4x10 Aluminum`, `8x10`, `1x15`, and `1x18`) shaped with enclosure-specific modal contours and baffle reflections, continuous `Box Scale`, `Cone Damping`, `Lo Res` / `Hi Res` trims, `HPF` / `LPF`, pan, and level — or browse/drag-and-drop your own `.wav` IR onto either cabinet slot downstream of the live motor and upstream of the analog console preamps.
-- **2D Virtual Microphones & Analog Preamp Suite:** Eight microphone voicings (`57`, `121`, `160`, `47`, `414`, `421`, `906`, `Wall`) with continuous radial cone position, grille distance (`0.5 cm` – `50 cm`), off-axis angle, capsule SPL overload, Fresnel phase alignment for comb-free multi-miking, polarity invert (`Ø`), and six circuit-modeled mic preamps from the Werewolf Dynamics Analog Suite (`Clean`, `73`, `12`, `76`, `REDD`, `Porta`).
-- **Studio Room & Room Smash:** Four acoustic spaces (`Tight Iso Booth`, `Wood Tracking Room`, `Large Live Chamber`, `Tiled Garage`) pairing six-wall image-source early reflections with a 4x4 Hadamard FDN stereo tail, continuous `Room Size`, `Distance`, `Damping`, `Width`, `Level`, 3-way stereo pan routing, and **Room Smash** (fast FET room-mic crush and harmonic grit distilled from **WD Duress**).
-- **12 Factory Rig Presets:** Curated dual-cabinet, multi-mic, and room rigs accessible directly from the header bar across VST3, CLAP, Standalone, and the live browser demo.
+- **Dual Procedural Cabinets, `8192`-Tap User `.wav` IRs & Cab B Micro-Delay (`Cab A` + `Cab B`):** Thirteen enclosures (`1x10 Tweed`, `1x12 Open`, `1x12 Ported`, `2x12 Open`, `2x12 Alnico`, `Vintage 4x12`, `Modern 4x12`, `Oversized Modern 4x12`, `4x12 Brit 75`, `4x10 Aluminum`, `8x10`, `1x15`, and `1x18`) shaped with enclosure-specific modal contours and baffle reflections, continuous `Box Scale`, `Cone Damping`, `Lo Res` / `Hi Res` trims, switchable `PRE` (**Pre-Preamp**) / `POST` (**Post-Preamp**) Console Mic Preamp Low/High Cut placement, `0.00 – 10.00 ms` **Cab B Micro-Delay** with live comb-filter analyzer parity, pan, and level — or browse/drag-and-drop your own `2048/4096/8192`-tap @ 48 kHz `.wav` IR onto either cabinet slot downstream of the live motor and upstream of the console mic preamps.
+- **Per-Cab Color Delta Audition (`DELTA`):** Real-time per-cabinet `DELTA` toggles isolating nonlinear speaker motor compression, cone breakup, capsule SPL saturation, and console mic preamp harmonics from linear cabinet/mic EQ.
+- **2D Virtual Microphones & Analog Console Preamps:** Eight microphone voicings (`57`, `121`, `160`, `47`, `414`, `421`, `906`, `Wall`) with continuous radial cone position, grille distance (`0.5 cm` – `50 cm`), off-axis angle, capsule SPL overload, Fresnel phase alignment for comb-free multi-miking, polarity invert (`Ø`), and six `2x`-oversampled circuit-modeled mic preamps from the Werewolf Dynamics Analog Suite (`Clean`, `73`, `12`, `76`, `REDD`, `Porta`).
+- **Studio Room & Room Smash:** Four acoustic spaces (`Tight Iso Booth`, `Wood Tracking Room`, `Large Live Chamber`, `Tiled Garage`) pairing six-wall image-source early reflections with `0 – 100 ms` **Room Pre-Delay**, 2nd-order Butterworth **Room Low/High Cut** filters, a 4x4 Hadamard FDN stereo tail, continuous `Room Size`, `Distance`, `Damping`, `Width`, `Level`, 3-way stereo pan routing, and **Room Smash** (fast FET room-mic crush and harmonic grit distilled from **WD Duress**).
+- **A/B Compare, Portable `.wdcab` Presets & 12 Factory Rigs:** Instant `A | B | COPY` comparison and cross-compatible `.wdcab` / `.xml` preset Save/Load shared identically between VST3, CLAP, Standalone, and the live browser demo.
+
+## What's New in v0.4.0
+
+- **Full `WD Amp` & Expanded `WD Load` Rig Mode:** Added the 3-way header selector (`CAB ONLY` | `AMP & LOAD` | `AMP + CABS`), expanded pickup/wiring/bleed/cable/dielectric/coupling modeling, Input Gate, Diode Overdrive, cascaded Koren triode preamp, and coupled `6L6GC` / `EL34` power section (`100` synchronized parameters).
+- **Pre-Power-Amp Studio FX Loop:** Added stereo-capable **Spring Tank**, **BBD Chorus/Delay**, and **Tape Echo** inside a lock-free pre-allocated `1.0 MiB` delay pool across `44.1 – 384 kHz`.
+- **`Pre-Preamp` / `Post-Preamp` Cab Cuts & Paired-GR Drive Control:** Added per-cabinet `PRE` / `POST` Console Mic Preamp Low/High Cut placement toggles and paired gain-reduction `Pre Drive` autogain across all `6` console preamps.
+- **Per-Cab Color Delta (`DELTA`) & Cross-Platform UI Polish:** Added live per-cabinet nonlinear coloration delta auditioning, full keyboard/ARIA accessibility, bundled `JetBrains Mono` readout typography, older-WebKit `color-mix()` / diagnostic resilience, and Round 8/9 verification.
+
+## What's New in v0.3.0 (Included in v0.4.0 Public Release)
+
+- **Instant A/B Compare & Portable `.wdcab` Presets:** Added `A | B | COPY` slot comparison (persisted in DAW session state, `pluginVersion="6"`, backward-compatible with `v0.3.0` and `v0.2.x` states) plus cross-compatible `.wdcab` / `.xml` preset Save and Load between native plugins and WebAssembly.
+- **`8192`-Tap User IRs & Cab B Micro-Delay:** Expanded custom `.wav` User IR support to auto-sized `2048/4096/8192` taps @ `48 kHz` via `-90 dB` tail trimming (resampled up to `384 kHz`) and added continuous `0.00 – 10.00 ms` **Cab B Micro-Delay** phase/comb alignment.
+- **Room Pre-Delay & Room Low/High Cut:** Added `0 – 100 ms` **Room Pre-Delay** and 2nd-order Butterworth **Room Low/High Cut** shaping (`20 – 600 Hz` / `1.5 – 20 kHz`) to the Studio Room engine.
 
 ## What's New in v0.2.1
 
@@ -44,9 +59,10 @@ Open **[https://xbombjackx.github.io/wd-cab-releases/](https://xbombjackx.github
 
 ## Install (Windows 10 / 11 64-bit)
 
-Place **WD Cab** directly after a guitar/bass amp head plugin (with its internal cab IR bypassed) or a hardware reactive load / preamp line out. Use `Input Cal` (`-18` to `+18 dB`) if your amp send runs hotter or cooler than `-12 dBFS` nominal.
+- **`CAB ONLY` (Default):** Place **WD Cab** directly after a guitar/bass amp head plugin (with its internal cab IR bypassed) or a hardware reactive load / preamp line out. Use `Input Cal` (`-18` to `+18 dB`) if your amp send runs hotter or cooler than `-12 dBFS` nominal.
+- **`AMP & LOAD` / `AMP + CABS`:** Place **WD Cab** directly on a raw guitar/bass DI track to run the **Expanded WD Load** front end, input gate, diode overdrive, cascaded triode preamp, **Studio FX Loop**, and coupled power amp + cabinets.
 
-1. Download `WDCab-v0.2.1-Windows-VST3-CLAP.zip` from **[GitHub Releases](https://github.com/xBombjackx/wd-cab-releases/releases/tag/v0.2.1)**.
+1. Download `WDCab-v0.4.0-Windows-VST3-CLAP.zip` from **[GitHub Releases](https://github.com/xBombjackx/wd-cab-releases/releases/tag/v0.4.0)**.
 2. Unzip and install **one** plugin format:
    - **VST3:** Copy the `WD Cab.vst3` folder into `C:\Program Files\Common Files\VST3\WD Cab.vst3`
    - **CLAP:** Copy `WD Cab.clap` into `C:\Program Files\Common Files\CLAP\WD Cab.clap` (or `%LOCALAPPDATA%\Programs\Common\CLAP\WD Cab.clap`)
@@ -54,7 +70,7 @@ Place **WD Cab** directly after a guitar/bass amp head plugin (with its internal
 
 ## Also from Werewolf Dynamics
 
-- **[Werewolf Dynamics — Analog Collection (v0.9.0)](https://github.com/xBombjackx/werewolf-dynamics-releases)** — twenty-six studio modules simulated from the circuit up (VST3, CLAP, AU), plus **[8 Live WebAssembly Browser Demos](https://xbombjackx.github.io/werewolf-dynamics-releases/)**, free.
+- **[Werewolf Dynamics — Analog Collection (v0.9.1)](https://github.com/xBombjackx/werewolf-dynamics-releases)** — studio modules simulated from the circuit up (VST3, CLAP, AU), plus **[22 Live WebAssembly Browser Demos](https://xbombjackx.github.io/werewolf-dynamics-releases/)**, free.
 
 ## License
 
